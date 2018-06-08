@@ -15,3 +15,20 @@ ind⟦S¹⟧ : ∀ {𝔭} (P : S¹ → Set 𝔭) (b : P base) (l : b ≡ b [ P �
 ind⟦S¹⟧ P b l base = b
 postulate
   βind⟦S¹⟧ : ∀ {𝔭} (P : S¹ → Set 𝔭) (b : P base) (l : b ≡ b [ P ↓ loop ]) → apd (ind⟦S¹⟧ P b l) loop ≡ l
+
+open import Bool
+open import Equivalence
+open import Suspension
+
+∑Bool≃S¹ : ∑ Bool ≃ S¹
+∑Bool≃S¹ = record
+  { f       = {!!}
+  ; isequiv = record
+  { g = {!!}
+  ; h = ?
+  ; inverseʳ = {!!}
+  ; inverseˡ = {!!}
+  }
+  } where Bool→S¹ : Bool → S¹
+          Bool→S¹ false = {!!}
+          Bool→S¹ true  = {!!}

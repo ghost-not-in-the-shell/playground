@@ -16,8 +16,14 @@ refl₍ x ₎ = refl
 sym : ∀ {𝔞} {A : Set 𝔞} {x y : A} → x ≡ y → y ≡ x
 sym refl = refl
 
+infix 6 _⁻¹
+_⁻¹ = sym
+
 trans : ∀ {𝔞} {A : Set 𝔞} {x y z : A} → x ≡ y → y ≡ z → x ≡ z
 trans refl refl = refl
+
+infixr 5 _∙_
+_∙_ = trans
 
 ap : ∀ {𝔞 𝔟} {A : Set 𝔞} {B : Set 𝔟} (f : A → B) → ∀ {x y} → x ≡ y → f x ≡ f y
 ap f refl = refl

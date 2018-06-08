@@ -18,4 +18,3 @@ ind⟦I⟧ P b₀ b₁ s 𝟘 = b₀
 ind⟦I⟧ P b₀ b₁ s 𝟙 = b₁
 postulate
   βind⟦I⟧ : ∀ {𝔭} (P : I → Set 𝔭) (b₀ : P 𝟘) (b₁ : P 𝟙) (s : b₀ ≡ b₁ [ P ↓ seg ]) → apd (ind⟦I⟧ P b₀ b₁ s) seg ≡ s
-
