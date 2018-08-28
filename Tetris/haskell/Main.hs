@@ -1,63 +1,64 @@
 {-# LANGUAGE UnicodeSyntax #-}
 module Main where
 
-import UI.NCurses as NCurses
+import Game       as Game
 import System.Random
 import Tetromino
-import Game as Game
-
-width ∷ Integer
-width = 20
-
-height ∷ Integer
-height = 40
+import UI.NCurses as NCurses
 
 delay ∷ Integer
-delay = 1000
+delay = 500
 
-reifyChanges ∷ Window → [Change] → Curses ()
-reifyChanges w [] = return ()
-reifyChanges w (On  (x , y) : cs) = updateWindow w $ moveCursor (fromIntegral x) (fromIntegral y) >> drawString "■"
-reifyChanges w (Off (x , y) : cs) = updateWindow w $ moveCursor (fromIntegral x) (fromIntegral y) >> drawString " "
-reifyChanges w (Delay       : cs) = getEvent w (Just delay) >> return ()
+width ∷ Integer
+width = 10
+
+height ∷ Integer
+height = 20
+
+applyChanges ∷ Window → [Change] → Curses ()
+applyChanges w [] = render >> return ()
+applyChanges w (On  (x , y) : cs) = updateWindow w (moveCursor y x >> drawString "■") >> applyChanges w cs
+applyChanges w (Off (x , y) : cs) = updateWindow w (moveCursor y x >> drawString " ") >> applyChanges w cs
+applyChanges w (Delay       : cs) = getEvent w (Just delay) >> applyChanges w cs
 
 keyEvents ∷ [(NCurses.Event , Game.Event)]
 keyEvents = [ (EventSpecialKey KeyDownArrow  , MoveDown)
             , (EventSpecialKey KeyLeftArrow  , MoveLeft)
             , (EventSpecialKey KeyRightArrow , MoveRight)
             , (EventSpecialKey KeyUpArrow    , RotateCW)
-            , (EventCharacter  'q'           , Quit)
-            , (EventCharacter  'Q'           , Quit)
+            , (EventCharacter  'k'           , MoveDown)
+            , (EventCharacter  'j'           , MoveLeft)
+            , (EventCharacter  'l'           , MoveRight)
+            , (EventCharacter  'i'           , RotateCW)
             , (EventCharacter  'g'           , Gravitate)
-            , (EventCharacter  'G'           , Gravitate)
+            , (EventCharacter  'q'           , Quit)
             ]
 
-newShape ∷ IO Shape
-newShape = randomRIO (minBound ∷ Shape , maxBound ∷ Shape)
-
-{-
-gameLoop ∷ Window → Game → IO ()
-gameLoop w g = do
-  me ← getEvent w (Just delay)
+gameLoop ∷ Window → Game → Curses ()
+gameLoop w g =
+  getEvent w (Just delay) >>= \ me →
   case me of
-    Nothing → do
-      s ← newShape
-      let (m , cs) = nextTetromino g s
-      reifyChanges w cs
-      case m of
-        Just g' → gameLoop w g'
-        Nothing → return ()
-    Just e → do
-      let (g' , cs) = updateGame (maybe None id (lookup e keyEvents))
-      reifyChanges w cs
-      gameLoop w g'
--}
+    Nothing → let (cs , mg') = update Tick g
+              in applyChanges w cs >>
+                 case mg' of
+                   Nothing → return ()
+                   Just g' → gameLoop w g'
+    Just k → let e = maybe None id (lookup k keyEvents)
+             in case e of
+                  Quit → return ()
+                  _    → let (cs , Just g') = update e g
+                         in applyChanges w cs >>
+                            gameLoop w g'
+
 
 main ∷ IO ()
-main = newStdGen >>= \ g →
-  let ss = randoms g ∷ [Shape]
-      game = Game (makeBoard width height) (head ss) (tail ss)
-  in runCurses $ do
-  w ← newWindow height width 0 0
-  closeWindow w
-  return ()
+main = newStdGen >>= \ gen →
+       let (g , cs) = newGame width height gen
+       in runCurses $ do
+         w ← newWindow height width 0 0
+         setEcho False
+         setCursorMode CursorInvisible
+         applyChanges w cs
+         render
+         gameLoop w g
+         closeWindow w

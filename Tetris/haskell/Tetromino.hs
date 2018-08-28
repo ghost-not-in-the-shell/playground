@@ -12,51 +12,54 @@ data Shape
   | S₁ | S₂
   | T₁ | T₂ | T₃ | T₄
   | Z₁ | Z₂
-  deriving (Bounded, Enum)
+  deriving (Enum, Bounded, Show)
+
+instance Random Shape where
+  random gen = case randomR ( fromEnum (minBound ∷ Shape)
+                            , fromEnum (maxBound ∷ Shape)) gen of
+                 (r , gen) → (toEnum r , gen)
+
+  randomR (s₁ , s₂) gen = case randomR ( fromEnum s₁
+                                       , fromEnum s₂) gen of
+                            (r , gen) → (toEnum r , gen)
 
 type Coord = (Integer , Integer)
 
 data Tetromino = Tetromino { _center ∷ Coord , _shape ∷ Shape }
+  deriving (Show)
 
 makeLenses ''Tetromino
 
-instance Random Shape where
-  random g = case randomR (fromEnum (minBound ∷ Shape) , fromEnum (maxBound ∷ Shape)) g of
-               (r , g') → (toEnum r , g')
+relativeCoord ∷ Shape → [Coord]
+relativeCoord I₁ = [(0,-1),(0,0),(0,1),(0,2)]
+relativeCoord I₂ = [(-1,0),(0,0),(1,0),(2,0)]
 
-  randomR (a , b) g = case randomR (fromEnum a , fromEnum b) g of
-                        (r , g') → (toEnum r , g')
+relativeCoord J₁ = [(-1,1),(0,-1),(0,0),(0,1)]
+relativeCoord J₂ = [(-1,-1),(-1,0),(0,0),(1,0)]
+relativeCoord J₃ = [(0,-1),(0,0),(0,1),(1,-1)]
+relativeCoord J₄ = [(-1,0),(0,0),(1,0),(1,1)]
 
-reifyShape ∷ Shape → [Coord]
-reifyShape I₁ = [(0,-1),(0,0),(0,1),(0,2)]
-reifyShape I₂ = [(-1,0),(0,0),(1,0),(2,0)]
+relativeCoord L₁ = [(0,-1),(0,0),(0,1),(1,1)]
+relativeCoord L₂ = [(-1,0),(-1,1),(0,0),(1,0)]
+relativeCoord L₃ = [(-1,-1),(0,-1),(0,0),(0,1)]
+relativeCoord L₄ = [(-1,0),(0,0),(1,0),(1,-1)]
 
-reifyShape J₁ = [(-1,1),(0,-1),(0,0),(0,1)]
-reifyShape J₂ = [(-1,-1),(-1,0),(0,0),(1,0)]
-reifyShape J₃ = [(0,-1),(0,0),(0,1),(1,-1)]
-reifyShape J₄ = [(-1,0),(0,0),(1,0),(1,1)]
+relativeCoord O = [(0,0),(0,1),(1,0),(1,1)]
 
-reifyShape L₁ = [(0,-1),(0,0),(0,1),(1,1)]
-reifyShape L₂ = [(-1,0),(-1,1),(0,0),(1,0)]
-reifyShape L₃ = [(-1,-1),(0,-1),(0,0),(0,1)]
-reifyShape L₄ = [(-1,0),(0,0),(1,0),(1,-1)]
+relativeCoord S₁ = [(-1,0),(0,-1),(0,0),(1,-1)]
+relativeCoord S₂ = [(0,-1),(0,0),(1,0),(1,1)]
 
-reifyShape O = [(0,0),(0,1),(1,0),(1,1)]
+relativeCoord T₁ = [(-1,0),(0,0),(0,1),(1,0)]
+relativeCoord T₂ = [(-1,0),(0,-1),(0,0),(0,1)]
+relativeCoord T₃ = [(-1,0),(0,-1),(0,0),(1,0)]
+relativeCoord T₄ = [(0,-1),(0,0),(0,1),(1,0)]
 
-reifyShape S₁ = [(-1,0),(0,-1),(0,0),(1,-1)]
-reifyShape S₂ = [(0,-1),(0,0),(1,0),(1,1)]
+relativeCoord Z₁ = [(-1,-1),(0,-1),(0,0),(1,0)]
+relativeCoord Z₂ = [(-1,0),(-1,1),(0,-1),(0,0)]
 
-reifyShape T₁ = [(-1,0),(0,0),(0,1),(1,0)]
-reifyShape T₂ = [(-1,0),(0,-1),(0,0),(0,1)]
-reifyShape T₃ = [(-1,0),(0,-1),(0,0),(1,0)]
-reifyShape T₄ = [(0,-1),(0,0),(0,1),(1,0)]
-
-reifyShape Z₁ = [(-1,-1),(0,-1),(0,0),(1,0)]
-reifyShape Z₂ = [(-1,0),(-1,1),(0,-1),(0,0)]
-
-reifyTetromino ∷ Tetromino → [Coord]
-reifyTetromino (Tetromino (c₁ , c₂) s) =
-  [(c₁ + offset₁ , c₂ + offset₂) | (offset₁ , offset₂) ← reifyShape s]
+absoluteCoord ∷ Tetromino → [Coord]
+absoluteCoord (Tetromino (c₁ , c₂) s)
+  = [(c₁ + offset₁ , c₂ + offset₂) | (offset₁ , offset₂) ← relativeCoord s]
 
 rotateShape ∷ Shape → Shape
 rotateShape I₁ = I₂
@@ -85,14 +88,11 @@ rotateShape T₄ = T₁
 rotateShape Z₁ = Z₂
 rotateShape Z₂ = Z₁
 
-rotateTetromino ∷ Tetromino → Tetromino
-rotateTetromino = over shape rotateShape
-
 extentDown ∷ Tetromino → Integer
-extentDown = maximum . map snd . reifyTetromino
+extentDown = maximum . map snd . absoluteCoord
 
 extentLeft ∷ Tetromino → Integer
-extentLeft = minimum . map fst . reifyTetromino
+extentLeft = minimum . map fst . absoluteCoord
 
 extentRight ∷ Tetromino → Integer
-extentRight = maximum . map fst . reifyTetromino
+extentRight = maximum . map fst . absoluteCoord
