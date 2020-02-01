@@ -1,7 +1,7 @@
 module BigStepNormalization where
 open import Data.List     hiding (map; lookup)
 open import Data.List.All
-open import Data.List.Any hiding (map)
+open import Data.List.Any hiding (map; lookup)
 open import Data.List.Membership.Propositional
 open import Relation.Binary.PropositionalEquality
 
