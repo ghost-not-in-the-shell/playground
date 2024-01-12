@@ -1,5 +1,5 @@
 {-# OPTIONS --type-in-type #-}
-module Category.Core where
+module Category.Base where
 open import Prelude
 
 record Op {ob : Set} (hom : ob → ob → Set) : Set where
