@@ -26,4 +26,9 @@ data Maybe (A : Set) : Set where
   nothing :     Maybe A
   just    : A → Maybe A
 
+infixr 5 _∷_
+data List (A : Set) : Set where
+  []  :              List A
+  _∷_ : A → List A → List A
+
 open import Equality public

@@ -1,8 +1,8 @@
 {-# OPTIONS --type-in-type #-}
-module Category.Base where
+module Category where
 open import Prelude
 
-record Op {ob : Set} (hom : ob → ob → Set) : Set where
+record CategoricalOp {ob : Set} (hom : ob → ob → Set) : Set where
   infixr 5 _∘_
   field
     id  : ∀ {A} → hom A A
@@ -11,24 +11,24 @@ record Op {ob : Set} (hom : ob → ob → Set) : Set where
   id₍_₎ : ∀ A → hom A A
   id₍ A ₎ = id
 
-open Op ⦃...⦄ public
+open CategoricalOp ⦃...⦄ public
 
-{-# DISPLAY Op.id    _ = id    #-}
-{-# DISPLAY Op.id₍_₎ _ = id₍_₎ #-}
-{-# DISPLAY Op._∘_   _ = _∘_   #-}
+{-# DISPLAY CategoricalOp.id    _ = id    #-}
+{-# DISPLAY CategoricalOp.id₍_₎ _ = id₍_₎ #-}
+{-# DISPLAY CategoricalOp._∘_   _ = _∘_   #-}
 
 record Category : Set where
   field
     ob : Set
     hom : ob → ob → Set
-    ⦃ op ⦄ : Op hom
+    ⦃ op ⦄ : CategoricalOp hom
 
     ∘-identityˡ : ∀ {A B} {f : hom A B} → id ∘ f ≡ f
     ∘-identityʳ : ∀ {A B} {f : hom A B} → f ∘ id ≡ f
     ∘-assoc : ∀ {A B C D} {f : hom A B} {g : hom B C} {h : hom C D}
       → (h ∘ g) ∘ f ≡ h ∘ (g ∘ f)
 
-open Category public
+open Category public hiding (op)
 
 infix 4 _∣_⟶_
 _∣_⟶_ = hom
@@ -85,13 +85,13 @@ functor⁼ {𝓒} {𝓓} {𝓕} {𝓖} (refl , refl) =
 
 record NaturalTransformation {𝓒 𝓓} (𝓕 𝓖 : 𝓒 ⟶ 𝓓) : Set where
   field
-    transform : ∀ A → 𝓓 ∣ 𝓕 ₀(A) ⟶ 𝓖 ₀(A)
+    component : ∀ {A} → 𝓓 ∣ 𝓕 ₀(A) ⟶ 𝓖 ₀(A)
 
   private
-    η = transform
+    η = component
 
   field
-    natural : ∀ {A B} {f : 𝓒 ∣ A ⟶ B} → η (B) ∘ 𝓕 ₁(f) ≡ 𝓖 ₁(f) ∘ η (A)
+    natural : ∀ {A B} {f : 𝓒 ∣ A ⟶ B} → η ∘ 𝓕 ₁(f) ≡ 𝓖 ₁(f) ∘ η
 
 open NaturalTransformation public
 
@@ -99,20 +99,24 @@ infix 4 _⟹_
 _⟹_ = NaturalTransformation
 {-# DISPLAY NaturalTransformation 𝓕 𝓖 = 𝓕 ⟹ 𝓖 #-}
 
-infix 6 _at_
-_at_ = transform
-{-# DISPLAY transform α A = α #-}
+infix 6 _⋆
+_⋆ = component
+{-# DISPLAY component α = α ⋆ #-}
+
+infix 6 _₍_₎
+_₍_₎ : ∀ {𝓒 𝓓} {𝓕 𝓖 : 𝓒 ⟶ 𝓓} (α : 𝓕 ⟹ 𝓖) (A : ob 𝓒) → 𝓓 ∣ 𝓕 ₀(A) ⟶ 𝓖 ₀(A)
+α ₍ A ₎ = component α {A = A}
 
 natural⁼ : ∀ {𝓒 𝓓} {𝓕 𝓖 : 𝓒 ⟶ 𝓓} {α β : 𝓕 ⟹ 𝓖}
-  → transform α ≡ transform β
+  → component α ≡ component β [ (∀ {A} → 𝓓 ∣ 𝓕 ₀(A) ⟶ 𝓖 ₀(A)) ]
   →           α ≡           β
 natural⁼ {𝓒} {𝓓} {𝓕} {𝓖} {α} {β} refl = irrelevance (ƛ⁼ $ ƛ⁼ $ ƛ⁼ $ uip (natural α) (natural β))
-  where Natural = ∀ {A B} {f : 𝓒 ∣ A ⟶ B} → β at B ∘ 𝓕 ₁(f) ≡ 𝓖 ₁(f) ∘ β at A
+  where Natural = ∀ {A B} {f : 𝓒 ∣ A ⟶ B} → β ⋆ ∘ 𝓕 ₁(f) ≡ 𝓖 ₁(f) ∘ β ⋆
 
         irrelevance : ∀ {α-natural β-natural : Natural}
                       → α-natural ≡ β-natural [ Natural ]
-                      → record { transform = transform β; natural = α-natural }
-                      ≡ record { transform = transform β; natural = β-natural }
+                      → record { component = component β; natural = α-natural }
+                      ≡ record { component = component β; natural = β-natural }
                       [ 𝓕 ⟹ 𝓖 ]
         irrelevance refl = refl
 
@@ -120,7 +124,7 @@ Function : Set → Set → Set
 Function A B = A → B
 
 instance
-  𝓢𝓮𝓽-op : Op Function
+  𝓢𝓮𝓽-op : CategoricalOp Function
   𝓢𝓮𝓽-op = record
     { id  = λ x → x
     ; _∘_ = λ g f x → g (f x)
