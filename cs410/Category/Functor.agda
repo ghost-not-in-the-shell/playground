@@ -20,3 +20,9 @@ private
       (𝓗 ₁(f) ∘ β ⋆) ∘ α ⋆  ≡⟨ ∘-assoc 𝓓 ⟩
       𝓗 ₁(f) ∘ (β ⋆ ∘ α ⋆)  ∎ }
     }
+
+𝓕𝓾𝓷-categoric : CategoricalOp NaturalTransformation
+𝓕𝓾𝓷-categoric = record
+  { id  = identity
+  ; _∘_ = composition
+  }

@@ -43,6 +43,19 @@ PathOver P p u v = subst P p u ≡ v
 
 syntax PathOver P p u v = u ≡ v [ P ↓ p ]
 
+module UIP where
+  uip : ∀ {A} {x y : A} (p q : x ≡ y) → p ≡ q
+  uip refl refl = refl
+
+open UIP public
+
+module Extensionality where
+  postulate
+    λ⁼ : ∀ {A : Set} {P : A → Set} {f g : (x : A) → P x} → (∀ (x) → f(x) ≡ g(x)) → f ≡ g
+    ƛ⁼ : ∀ {A : Set} {P : A → Set} {f g : {x : A} → P x} → (∀ {x} → f{x} ≡ g{x}) → f ≡ g [ (∀ {x} → P x) ]
+
+open Extensionality public
+
 module ≡-Reasoning where
   infix  1 begin_
   infixr 2 _≡⟨_⟩_
@@ -58,16 +71,3 @@ module ≡-Reasoning where
   x ∎ = refl₍ x ₎
 
 open ≡-Reasoning public
-
-module UIP where
-  uip : ∀ {A} {x y : A} (p q : x ≡ y) → p ≡ q
-  uip refl refl = refl
-
-open UIP public
-
-module Extensionality where
-  postulate
-    λ⁼ : ∀ {A : Set} {P : A → Set} {f g : (x : A) → P x} → (∀ (x) → f(x) ≡ g(x)) → f ≡ g
-    ƛ⁼ : ∀ {A : Set} {P : A → Set} {f g : {x : A} → P x} → (∀ {x} → f{x} ≡ g{x}) → f ≡ g [ (∀ {x} → P x) ]
-
-open Extensionality public

@@ -20,8 +20,8 @@ private
     }
 
 instance
-  𝓒𝓪𝓽-op : CategoricalOp Functor
-  𝓒𝓪𝓽-op = record
+  𝓒𝓪𝓽-categoric : CategoricalOp Functor
+  𝓒𝓪𝓽-categoric = record
     { id  = identity
     ; _∘_ = composition
     }
@@ -30,7 +30,7 @@ instance
 𝓒𝓪𝓽 = record
   { ob = Category
   ; hom = Functor
-  ; op = 𝓒𝓪𝓽-op
+  ; op = 𝓒𝓪𝓽-categoric
   ; ∘-identityˡ = functor⁼ (refl , refl)
   ; ∘-identityʳ = functor⁼ (refl , refl)
   ; ∘-assoc = functor⁼ (refl , refl)

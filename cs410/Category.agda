@@ -60,13 +60,13 @@ _₁_ = map₁
 {-# DISPLAY map₀ 𝓕 A = 𝓕 ₀(A) #-}
 {-# DISPLAY map₁ 𝓕 f = 𝓕 ₁(f) #-}
 
-record _≡Functor_ {𝓒 𝓓} (𝓕 𝓖 : 𝓒 ⟶ 𝓓) : Set where
+record _≡functor_ {𝓒 𝓓} (𝓕 𝓖 : 𝓒 ⟶ 𝓓) : Set where
   constructor _,_
   field
     map₀⁼ : 𝓕 ₀_ ≡ 𝓖 ₀_
     map₁⁼ : 𝓕 ₁_ ≡ 𝓖 ₁_ [ (λ map₀ → ∀ {A B} → 𝓒 ∣ A ⟶ B → 𝓓 ∣ map₀ A ⟶ map₀ B) ↓ map₀⁼ ]
 
-functor⁼ : ∀ {𝓒 𝓓} {𝓕 𝓖 : 𝓒 ⟶ 𝓓} → 𝓕 ≡Functor 𝓖 → 𝓕 ≡ 𝓖
+functor⁼ : ∀ {𝓒 𝓓} {𝓕 𝓖 : 𝓒 ⟶ 𝓓} → 𝓕 ≡functor 𝓖 → 𝓕 ≡ 𝓖
 functor⁼ {𝓒} {𝓓} {𝓕} {𝓖} (refl , refl) =
   irrelevance (ƛ⁼ $                     uip (resp-id 𝓕) (resp-id 𝓖))
               (ƛ⁼ $ ƛ⁼ $ ƛ⁼ $ ƛ⁼ $ ƛ⁼ $ uip (resp-∘  𝓕) (resp-∘  𝓖))
@@ -124,8 +124,8 @@ Function : Set → Set → Set
 Function A B = A → B
 
 instance
-  𝓢𝓮𝓽-op : CategoricalOp Function
-  𝓢𝓮𝓽-op = record
+  𝓢𝓮𝓽-categoric : CategoricalOp Function
+  𝓢𝓮𝓽-categoric = record
     { id  = λ x → x
     ; _∘_ = λ g f x → g (f x)
     }
@@ -134,7 +134,7 @@ instance
 𝓢𝓮𝓽 = record
   { ob = Set
   ; hom = Function
-  ; op = 𝓢𝓮𝓽-op
+  ; op = 𝓢𝓮𝓽-categoric
   ; ∘-identityˡ = refl
   ; ∘-identityʳ = refl
   ; ∘-assoc = refl
