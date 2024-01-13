@@ -80,7 +80,7 @@ module CategoricalReasoning where
       because : ⟦ `f ⟧ ≡ ⟦ `g ⟧
 
   open ⟦_⟧≡⟦_⟧ public
-  
+
   infix  1 ⊨begin_
   infixr 2 _≡[_]_ _≡⟦_⟧_
   infix  3 _⟦∎⟧

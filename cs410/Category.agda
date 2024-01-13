@@ -73,7 +73,7 @@ functor⁼ {𝓒} {𝓓} {𝓕} {𝓖} (refl , refl) =
   where
     Resp-id = ∀ {A} → 𝓖 ₁(id) ≡ id₍ 𝓖 ₀(A) ₎
     Resp-∘  = ∀ {A B C} {f : hom 𝓒 A B} {g : hom 𝓒 B C} → 𝓖 ₁(g ∘ f) ≡ 𝓖 ₁(g) ∘ 𝓕 ₁(f)
-    
+
     irrelevance : ∀ {𝓕-resp-id 𝓖-resp-id : Resp-id}
                     {𝓕-resp-∘  𝓖-resp-∘  : Resp-∘ }
                   → 𝓕-resp-id ≡ 𝓖-resp-id [ Resp-id ]
