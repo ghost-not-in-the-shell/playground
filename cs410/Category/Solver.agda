@@ -1,9 +1,9 @@
-module Solver where
+module Category.Solver where
 open import Prelude
-open import Category
+open import Category.Base
 
 infixr 5 _○_
-infix  7 `_
+infix  6 `_
 data Syn (𝓒 : Category) : ob 𝓒 → ob 𝓒 → Set where
   `_ : ∀ {A B} → hom 𝓒 A B → Syn 𝓒 A B
   `id : ∀ {A} → Syn 𝓒 A A

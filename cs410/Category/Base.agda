@@ -1,21 +1,6 @@
 {-# OPTIONS --type-in-type #-}
-module Category where
+module Category.Base where
 open import Prelude
-
-record CategoricalOp {ob : Set} (hom : ob → ob → Set) : Set where
-  infixr 5 _∘_
-  field
-    id  : ∀ {A} → hom A A
-    _∘_ : ∀ {A B C} → hom B C → hom A B → hom A C
-
-  id₍_₎ : ∀ A → hom A A
-  id₍ A ₎ = id
-
-open CategoricalOp ⦃...⦄ public
-
-{-# DISPLAY CategoricalOp.id    _ = id    #-}
-{-# DISPLAY CategoricalOp.id₍_₎ _ = id₍_₎ #-}
-{-# DISPLAY CategoricalOp._∘_   _ = _∘_   #-}
 
 record Category : Set where
   field
@@ -68,20 +53,20 @@ record _≡functor_ {𝓒 𝓓} (𝓕 𝓖 : 𝓒 ⟶ 𝓓) : Set where
 
 functor⁼ : ∀ {𝓒 𝓓} {𝓕 𝓖 : 𝓒 ⟶ 𝓓} → 𝓕 ≡functor 𝓖 → 𝓕 ≡ 𝓖
 functor⁼ {𝓒} {𝓓} {𝓕} {𝓖} (refl , refl) =
-  irrelevance (ƛ⁼ $                     uip (resp-id 𝓕) (resp-id 𝓖))
-              (ƛ⁼ $ ƛ⁼ $ ƛ⁼ $ ƛ⁼ $ ƛ⁼ $ uip (resp-∘  𝓕) (resp-∘  𝓖))
+  lemma (ƛ⁼ $                     uip (resp-id 𝓕) (resp-id 𝓖))
+        (ƛ⁼ $ ƛ⁼ $ ƛ⁼ $ ƛ⁼ $ ƛ⁼ $ uip (resp-∘  𝓕) (resp-∘  𝓖))
   where
     Resp-id = ∀ {A} → 𝓖 ₁(id) ≡ id₍ 𝓖 ₀(A) ₎
     Resp-∘  = ∀ {A B C} {f : hom 𝓒 A B} {g : hom 𝓒 B C} → 𝓖 ₁(g ∘ f) ≡ 𝓖 ₁(g) ∘ 𝓕 ₁(f)
 
-    irrelevance : ∀ {𝓕-resp-id 𝓖-resp-id : Resp-id}
-                    {𝓕-resp-∘  𝓖-resp-∘  : Resp-∘ }
-                  → 𝓕-resp-id ≡ 𝓖-resp-id [ Resp-id ]
-                  → 𝓕-resp-∘  ≡ 𝓖-resp-∘  [ Resp-∘  ]
-                  → record { map₀ = 𝓖 ₀_; map₁ = 𝓖 ₁_; resp-id = 𝓕-resp-id; resp-∘ = 𝓕-resp-∘ }
-                  ≡ record { map₀ = 𝓖 ₀_; map₁ = 𝓖 ₁_; resp-id = 𝓖-resp-id; resp-∘ = 𝓖-resp-∘ }
-                  [ 𝓒 ⟶ 𝓓 ]
-    irrelevance refl refl = refl
+    lemma : ∀ {𝓕-resp-id 𝓖-resp-id : Resp-id}
+              {𝓕-resp-∘  𝓖-resp-∘  : Resp-∘ }
+            → 𝓕-resp-id ≡ 𝓖-resp-id [ Resp-id ]
+            → 𝓕-resp-∘  ≡ 𝓖-resp-∘  [ Resp-∘  ]
+            → record { map₀ = 𝓖 ₀_; map₁ = 𝓖 ₁_; resp-id = 𝓕-resp-id; resp-∘ = 𝓕-resp-∘ }
+            ≡ record { map₀ = 𝓖 ₀_; map₁ = 𝓖 ₁_; resp-id = 𝓖-resp-id; resp-∘ = 𝓖-resp-∘ }
+            [ 𝓒 ⟶ 𝓓 ]
+    lemma refl refl = refl
 
 record NaturalTransformation {𝓒 𝓓} (𝓕 𝓖 : 𝓒 ⟶ 𝓓) : Set where
   field
@@ -110,32 +95,12 @@ _₍_₎ : ∀ {𝓒 𝓓} {𝓕 𝓖 : 𝓒 ⟶ 𝓓} (α : 𝓕 ⟹ 𝓖) (A :
 natural⁼ : ∀ {𝓒 𝓓} {𝓕 𝓖 : 𝓒 ⟶ 𝓓} {α β : 𝓕 ⟹ 𝓖}
   → component α ≡ component β [ (∀ {A} → 𝓓 ∣ 𝓕 ₀(A) ⟶ 𝓖 ₀(A)) ]
   →           α ≡           β
-natural⁼ {𝓒} {𝓓} {𝓕} {𝓖} {α} {β} refl = irrelevance (ƛ⁼ $ ƛ⁼ $ ƛ⁼ $ uip (natural α) (natural β))
+natural⁼ {𝓒} {𝓓} {𝓕} {𝓖} {α} {β} refl = lemma (ƛ⁼ $ ƛ⁼ $ ƛ⁼ $ uip (natural α) (natural β))
   where Natural = ∀ {A B} {f : 𝓒 ∣ A ⟶ B} → β ⋆ ∘ 𝓕 ₁(f) ≡ 𝓖 ₁(f) ∘ β ⋆
 
-        irrelevance : ∀ {α-natural β-natural : Natural}
-                      → α-natural ≡ β-natural [ Natural ]
-                      → record { component = component β; natural = α-natural }
-                      ≡ record { component = component β; natural = β-natural }
-                      [ 𝓕 ⟹ 𝓖 ]
-        irrelevance refl = refl
-
-Function : Set → Set → Set
-Function A B = A → B
-
-instance
-  𝓢𝓮𝓽-categoric : CategoricalOp Function
-  𝓢𝓮𝓽-categoric = record
-    { id  = λ x → x
-    ; _∘_ = λ g f x → g (f x)
-    }
-
-𝓢𝓮𝓽 : Category
-𝓢𝓮𝓽 = record
-  { ob = Set
-  ; hom = Function
-  ; op = 𝓢𝓮𝓽-categoric
-  ; ∘-identityˡ = refl
-  ; ∘-identityʳ = refl
-  ; ∘-assoc = refl
-  }
+        lemma : ∀ {α-natural β-natural : Natural}
+                → α-natural ≡ β-natural [ Natural ]
+                → record { component = component β; natural = α-natural }
+                ≡ record { component = component β; natural = β-natural }
+                [ 𝓕 ⟹ 𝓖 ]
+        lemma refl = refl

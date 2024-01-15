@@ -1,6 +1,6 @@
 module Category.Category where
 open import Prelude
-open import Category
+open import Category.Base
 
 private
   identity : ∀ {𝓒} → 𝓒 ⟶ 𝓒
@@ -20,18 +20,18 @@ private
     }
 
 instance
-  𝓒𝓪𝓽-categoric : CategoricalOp Functor
-  𝓒𝓪𝓽-categoric = record
+  𝓒𝓪𝓽-categorical : CategoricalOp Functor
+  𝓒𝓪𝓽-categorical = record
     { id  = identity
     ; _∘_ = composition
     }
 
 𝓒𝓪𝓽 : Category
 𝓒𝓪𝓽 = record
-  { ob = Category
+  { ob  = Category
   ; hom = Functor
-  ; op = 𝓒𝓪𝓽-categoric
+  ; op  = 𝓒𝓪𝓽-categorical
   ; ∘-identityˡ = functor⁼ (refl , refl)
   ; ∘-identityʳ = functor⁼ (refl , refl)
-  ; ∘-assoc = functor⁼ (refl , refl)
+  ; ∘-assoc     = functor⁼ (refl , refl)
   }

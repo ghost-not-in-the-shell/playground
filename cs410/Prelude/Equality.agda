@@ -1,4 +1,4 @@
-module Equality where
+module Prelude.Equality where
 
 infix 4 _≡_
 data _≡_ {A : Set} (x : A) : A → Set where

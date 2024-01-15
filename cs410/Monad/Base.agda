@@ -1,7 +1,7 @@
 {-# OPTIONS --type-in-type #-}
-module Monad where
+module Monad.Base where
 open import Prelude
-open import Category
+open import Category.Base
 open import Category.Category
 
 record MonadicOp {𝓒 : Category} (𝓜 : 𝓒 ⟶ 𝓒) : Set where
@@ -9,15 +9,21 @@ record MonadicOp {𝓒 : Category} (𝓜 : 𝓒 ⟶ 𝓒) : Set where
     return : ∀ {A} → 𝓒 ∣ A ⟶ 𝓜 ₀(A)
     join   : ∀ {A} → 𝓒 ∣ 𝓜 ₀(𝓜 ₀(A)) ⟶ 𝓜 ₀(A)
 
-  infixl 5 _>=>_
-  _>=>_ : ∀ {A B C : ob 𝓒}
+  infixl 4 _=<<_
+  _=<<_ : ∀ {A B}
+    → 𝓒 ∣      A  ⟶ 𝓜 ₀(B)
+    → 𝓒 ∣ 𝓜 ₀(A) ⟶ 𝓜 ₀(B)
+  _=<<_ = λ f → join ∘ 𝓜 ₁(f)
+
+  infixl 4 _>=>_
+  _>=>_ : ∀ {A B C}
     → 𝓒 ∣ A ⟶ 𝓜 ₀(B)
     → 𝓒 ∣ B ⟶ 𝓜 ₀(C)
     → 𝓒 ∣ A ⟶ 𝓜 ₀(C)
   f >=> g = join ∘ 𝓜 ₁(g) ∘ f
 
-  infixr 5 _<=<_
-  _<=<_ : ∀ {A B C : ob 𝓒}
+  infixr 4 _<=<_
+  _<=<_ : ∀ {A B C}
     → 𝓒 ∣ B ⟶ 𝓜 ₀(C)
     → 𝓒 ∣ A ⟶ 𝓜 ₀(B)
     → 𝓒 ∣ A ⟶ 𝓜 ₀(C)
@@ -33,9 +39,9 @@ open MonadicOp ⦃...⦄ public
 record Monad {𝓒 : Category} (𝓜 : 𝓒 ⟶ 𝓒) : Set where
   field
     unit : id ⟹ 𝓜
-    -- natural : ∀ {A B} {f : 𝓒 ∣ A ⟶ B} → return ∘ f ≡ 𝓜 ₁(f) ∘ return
+    -- natural unit : ∀ {A B} {f : 𝓒 ∣ A ⟶ B} → return ∘ f ≡ 𝓜 ₁(f) ∘ return
     mult : 𝓜 ∘ 𝓜 ⟹ 𝓜
-    -- natural : ∀ {A B} {f : 𝓒 ∣ A ⟶ B} → join ∘ 𝓜 ₁(𝓜 ₁(f)) ≡ 𝓜 ₁(f) ∘ join
+    -- natural mult : ∀ {A B} {f : 𝓒 ∣ A ⟶ B} → join ∘ 𝓜 ₁(𝓜 ₁(f)) ≡ 𝓜 ₁(f) ∘ join
 
     identityˡ : ∀ {A} → mult ₍ A ₎ ∘ 𝓜 ₁(unit ₍ A ₎) ≡ id
     identityʳ : ∀ {A} → mult ₍ A ₎ ∘ unit ₍ 𝓜 ₀(A) ₎ ≡ id

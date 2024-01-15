@@ -1,9 +1,9 @@
-open import Category
-open import Monad
+open import Category.Base
+open import Monad.Base
 module Category.Kleisli {𝓒 : Category} {𝓜 : 𝓒 ⟶ 𝓒} (ℳ : Monad 𝓜) where
 open import Prelude
-open import Solver
 open import Category.Category
+open import Category.Solver
 
 private instance
   𝓜-monadic = monadic ℳ
