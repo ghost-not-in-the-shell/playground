@@ -1,33 +1,34 @@
 module Category.Solver where
 open import Prelude
 open import Category.Base
+open import Functor.Base
 
 infixr 5 _○_
 infix  6 `_
-data Syn (𝓒 : Category) : ob 𝓒 → ob 𝓒 → Set where
-  `_ : ∀ {A B} → hom 𝓒 A B → Syn 𝓒 A B
+data Syn (𝓒 : Category) : Ob 𝓒 → Ob 𝓒 → Set where
+  `_ : ∀ {A B} → Hom 𝓒 A B → Syn 𝓒 A B
   `id : ∀ {A} → Syn 𝓒 A A
   _○_ : ∀ {A B C} → Syn 𝓒 B C → Syn 𝓒 A B → Syn 𝓒 A C
   `map : ∀ {𝓧 A B} (𝓕 : 𝓧 ⟶ 𝓒) → Syn 𝓧 A B → Syn 𝓒 (𝓕 ₀(A)) (𝓕 ₀(B))
 
-⟦_⟧ : ∀ {𝓒 A B} → Syn 𝓒 A B → hom 𝓒 A B
+⟦_⟧ : ∀ {𝓒 A B} → Syn 𝓒 A B → Hom 𝓒 A B
 ⟦ ` f       ⟧ = f
 ⟦ `id       ⟧ = id
 ⟦ `g ○ `f   ⟧ = ⟦ `g ⟧ ∘ ⟦ `f ⟧
 ⟦ `map 𝓕 `f ⟧ = 𝓕 ₁ ⟦ `f ⟧
 
-data Norm (𝓒 : Category) : ob 𝓒 → ob 𝓒 → Set where
-  `_ : ∀ {A B} → hom 𝓒 A B → Norm 𝓒 A B
+data Norm (𝓒 : Category) : Ob 𝓒 → Ob 𝓒 → Set where
+  `_ : ∀ {A B} → Hom 𝓒 A B → Norm 𝓒 A B
   `map : ∀ {𝓧 A B} (𝓕 : 𝓧 ⟶ 𝓒) → Norm 𝓧 A B → Norm 𝓒 (𝓕 ₀(A)) (𝓕 ₀(B))
 
-Sp : ∀ 𝓒 → ob 𝓒 → ob 𝓒 → Set
+Sp : ∀ 𝓒 → Ob 𝓒 → Ob 𝓒 → Set
 Sp 𝓒 A B = Star (Norm 𝓒) A B
 
-⟦_↓⟧ : ∀ {𝓒 A B} → Norm 𝓒 A B → hom 𝓒 A B
+⟦_↓⟧ : ∀ {𝓒 A B} → Norm 𝓒 A B → Hom 𝓒 A B
 ⟦ ` f       ↓⟧ = f
 ⟦ `map 𝓕 `f ↓⟧ = 𝓕 ₁ ⟦ `f ↓⟧
 
-⟦_⇓⟧ : ∀ {𝓒 A B} → Sp 𝓒 A B → hom 𝓒 A B
+⟦_⇓⟧ : ∀ {𝓒 A B} → Sp 𝓒 A B → Hom 𝓒 A B
 ⟦ ε        ⇓⟧ = id
 ⟦ `f ◅ `fs ⇓⟧ = ⟦ `fs ⇓⟧ ∘ ⟦ `f ↓⟧
 
@@ -66,8 +67,8 @@ sound (`map 𝓕 `f) = begin
   𝓕 ₁ ⟦ norm `f ⇓⟧              ≡⟨ cong (𝓕 ₁_) (sound `f) ⟩
   𝓕 ₁ ⟦ `f ⟧                    ∎
 
-solve : ∀ {𝓒 A B} {`f `g : Syn 𝓒 A B} → ⟦ norm `f ⇓⟧ ≡ ⟦ norm `g ⇓⟧ → ⟦ `f ⟧ ≡ ⟦ `g ⟧
-solve {`f = `f} {`g} hyp = begin
+solve : ∀ 𝓒 {A B} (`f `g : Syn 𝓒 A B) → ⟦ norm `f ⇓⟧ ≡ ⟦ norm `g ⇓⟧ → ⟦ `f ⟧ ≡ ⟦ `g ⟧
+solve 𝓒 `f `g hyp = begin
   ⟦      `f  ⟧  ≡⟨ sym (sound `f) ⟩
   ⟦ norm `f ⇓⟧  ≡⟨ hyp ⟩
   ⟦ norm `g ⇓⟧  ≡⟨ sound `g ⟩
@@ -81,15 +82,15 @@ module CategoricalReasoning where
 
   open ⟦_⟧≡⟦_⟧ public
 
-  infix  1 ⊨begin_
+  infix  1 _⊨begin_
   infixr 2 _≡[_]_ _≡⟦_⟧_
   infix  3 _⟦∎⟧
 
-  ⊨begin_ : ∀ {𝓒 A B} {`f `g : Syn 𝓒 A B} → ⟦ `f ⟧≡⟦ `g ⟧ → ⟦ `f ⟧ ≡ ⟦ `g ⟧
-  ⊨begin p = because p
+  _⊨begin_ : ∀ 𝓒 {A B} {`f `g : Syn 𝓒 A B} → ⟦ `f ⟧≡⟦ `g ⟧ → ⟦ `f ⟧ ≡ ⟦ `g ⟧
+  𝓒 ⊨begin p = because p
 
   _≡[_]_ : ∀ {𝓒 A B} (`f : Syn 𝓒 A B) {`g `h} → ⟦ norm `f ⇓⟧ ≡ ⟦ norm `g ⇓⟧ → ⟦ `g ⟧≡⟦ `h ⟧ → ⟦ `f ⟧≡⟦ `h ⟧
-  because (_≡[_]_ `f {`g} p q) = ⟦ `f ⟧ ≡⟨ solve {`f = `f} {`g = `g} p ⟩ because q
+  because (_≡[_]_ `f {`g} p q) = ⟦ `f ⟧ ≡⟨ solve _ `f `g p ⟩ because q
 
   _≡⟦_⟧_ : ∀ {𝓒 A B} (`f : Syn 𝓒 A B) {`g `h} → ⟦ `f ⟧ ≡ ⟦ `g ⟧ → ⟦ `g ⟧≡⟦ `h ⟧ → ⟦ `f ⟧≡⟦ `h ⟧
   because (`f ≡⟦ p ⟧ q) = ⟦ `f ⟧ ≡⟨ p ⟩ because q

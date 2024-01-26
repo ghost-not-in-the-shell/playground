@@ -17,9 +17,9 @@ private
 
 𝓞𝓻𝓭 : Category
 𝓞𝓻𝓭 = record
-  { ob = Preorder
-  ; hom = MonotoneMap
-  ; op = record
+  { Ob  = Preorder
+  ; Hom = MonotoneMap
+  ; op  = record
     { id  = identity
     ; _∘_ = composition
     }

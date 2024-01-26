@@ -4,10 +4,10 @@ open import Category.Base
 
 𝓓𝓲𝓼𝓬𝓻𝓮𝓽𝓮 : Set → Category
 𝓓𝓲𝓼𝓬𝓻𝓮𝓽𝓮 A = record
-  { ob  = A
-  ; hom = _≡_
+  { Ob  = A
+  ; Hom = _≡_
   ; op  = record
-    { id = refl
+    { id  = refl
     ; _∘_ = flip trans
     }
   ; ∘-identityˡ = uip _ _

@@ -1,5 +1,6 @@
 {-# OPTIONS --type-in-type #-}
 module Prelude.Function where
+open import Prelude.Equality
 open import Prelude.Op
 
 Function : Set → Set → Set
@@ -29,3 +30,7 @@ f $ x = f x
 infixl 1 _⟨_⟩_
 _⟨_⟩_ : ∀ {A B C : Set} → A → (A → B → C) → B → C
 x ⟨ f ⟩ y = f x y
+
+infixr 0 _-⟨_⟩-_
+_-⟨_⟩-_ : ∀ {A₁ A₂ B₁ B₂ C : Set} → (A₁ → A₂) → (A₂ → B₂ → C) → (B₁ → B₂) → (A₁ → B₁ → C)
+f -⟨ _*_ ⟩- g = λ x y → f x * g y

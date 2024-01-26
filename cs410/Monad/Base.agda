@@ -2,7 +2,8 @@
 module Monad.Base where
 open import Prelude
 open import Category.Base
-open import Category.Category
+open import Functor.Base
+open import NaturalTransformation.Base
 
 record MonadicOp {𝓒 : Category} (𝓜 : 𝓒 ⟶ 𝓒) : Set where
   field
