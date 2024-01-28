@@ -63,15 +63,26 @@ record Isomorphism 𝓒 {A B} (f : 𝓒 ∣ A ⟶ B) : Set where
 
 open Isomorphism public hiding (inverse)
 
-infix 6 _⁻¹
-_⁻¹ : ∀ {𝓒 A B} {f : 𝓒 ∣ A ⟶ B} → Isomorphism 𝓒 f → 𝓒 ∣ B ⟶ A
-f ⁻¹ = Isomorphism.inverse f
-
 ∣_∣ : ∀ {𝓒 A B} {f : 𝓒 ∣ A ⟶ B} → Isomorphism 𝓒 f → 𝓒 ∣ A ⟶ B
 ∣_∣ {f = f} _ = f
+
+infix 6 _⁻¹
+_⁻¹ : ∀ {𝓒 A B} {∣f∣ : 𝓒 ∣ A ⟶ B} (f : Isomorphism 𝓒 ∣f∣) → Isomorphism 𝓒 (Isomorphism.inverse f)
+f ⁻¹ = record
+  { inverse = ∣ f ∣
+  ; isoˡ = isoʳ f
+  ; isoʳ = isoˡ f
+  }
 
 infix 4 ≅-syntax
 ≅-syntax : ∀ 𝓒 → Ob 𝓒 → Ob 𝓒 → Set
 ≅-syntax 𝓒 A B = ∃[ f ] Isomorphism 𝓒 {A} {B} f
 
 syntax ≅-syntax 𝓒 A B = A ≅ B [ 𝓒 ]
+
+≅-sym : ∀ {𝓒 A B} → A ≅ B [ 𝓒 ] → B ≅ A [ 𝓒 ]
+≅-sym (-, f) = ∣ f ⁻¹ ∣ , record
+  { inverse = ∣ f ∣
+  ; isoˡ = isoʳ f
+  ; isoʳ = isoˡ f
+  }

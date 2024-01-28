@@ -12,6 +12,9 @@ record Σ (A : Set) (B : A → Set) : Set where
 
 open Σ public
 
+infixr 4 -,_
+pattern -,_ y = _ , y
+
 ∃ : ∀ {A : Set} (B : A → Set) → Set
 ∃ = Σ _
 
