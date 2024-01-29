@@ -29,13 +29,13 @@ record Equivalence (𝓕 : 𝓒 ⟶ 𝓓) : Set where
     to = ∣ surj ∣
 
     from : ∀ {A} → 𝓓 ∣ A ⟶ 𝓕 ₀(inverse₀ A)
-    from = surj ⁻¹
+    from = ∣ surj ⁻¹ ∣
 
     𝓕₁ : ∀ {A B} → 𝓒 ∣ A ⟶ B → 𝓓 ∣ 𝓕 ₀(A) ⟶ 𝓕 ₀(B)
     𝓕₁ = ∣ embed ∣
 
     𝓕₁⁻¹ : ∀ {A B} → 𝓓 ∣ 𝓕 ₀(A) ⟶ 𝓕 ₀(B) → 𝓒 ∣ A ⟶ B
-    𝓕₁⁻¹ = embed ⁻¹
+    𝓕₁⁻¹ = ∣ embed ⁻¹ ∣
 
   inverse₁ : ∀ {A B} → 𝓓 ∣ A ⟶ B → 𝓒 ∣ inverse₀ A ⟶ inverse₀ B
   inverse₁ {A} {B} f = 𝓕₁⁻¹ (from ∘ f ∘ to)

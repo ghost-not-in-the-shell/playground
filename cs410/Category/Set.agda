@@ -3,7 +3,6 @@ module Category.Set where
 open import Prelude
 open import Category.Base
 open import Functor.Base
-open import Isomorphism
 
 𝓢𝓮𝓽 : Category
 𝓢𝓮𝓽 = record

@@ -1,9 +1,10 @@
-module NaturalTransformation.Base where
+module Natural.Base where
 open import Prelude
 open import Category.Base
 open import Functor.Base
 
 record NaturalTransformation {𝓒 𝓓} (𝓕 𝓖 : 𝓒 ⟶ 𝓓) : Set where
+  constructor _,_
   field
     component : ∀ {A} → 𝓓 ∣ 𝓕 ₀(A) ⟶ 𝓖 ₀(A)
 
@@ -65,7 +66,9 @@ module _ {𝓒 𝓓 : Category} where
     𝓕𝓾𝓷-categorical = record
       { id  = identity
       ; _∘_ = vertical
-      whiskerˡ : ∀ {𝓒 𝓓 𝓔} (𝓕 : 𝓒 ⟶ 𝓓) {𝓖 𝓖′ : 𝓓 ⟶ 𝓔}
+      }
+
+whiskerˡ : ∀ {𝓒 𝓓 𝓔} (𝓕 : 𝓒 ⟶ 𝓓) {𝓖 𝓖′ : 𝓓 ⟶ 𝓔}
   → 𝓖     ⟹ 𝓖′
   → 𝓖 ∘ 𝓕 ⟹ 𝓖′ ∘ 𝓕
 whiskerˡ 𝓕 {𝓖} {𝓖′} β = record

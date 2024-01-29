@@ -2,15 +2,19 @@
 open import Category.Base
 module Functor.Embedding {𝓒 𝓓} where
 open import Prelude
+open import Category.Isomorphism
 open import Category.Set
 open import Category.Solver
 open import Functor.Base
-open import Isomorphism
+
+Faithful : 𝓒 ⟶ 𝓓 → Set
+Faithful 𝓕 = ∀ {A B} {f g : 𝓒 ∣ A ⟶ B} → 𝓕 ₁(f) ≡ 𝓕 ₁(g) → f ≡ g
+
+Full : 𝓒 ⟶ 𝓓 → Set
+Full 𝓕 = ∀ {A B} (g : 𝓓 ∣ 𝓕 ₀(A) ⟶ 𝓕 ₀(B)) → ∃[ f ] 𝓕 ₁(f) ≡ g
 
 Embedding : 𝓒 ⟶ 𝓓 → Set
 Embedding 𝓕 = ∀ {A B} → Isomorphism 𝓢𝓮𝓽 $ map₁ 𝓕 {A} {B}
-
--- ∀ {A B} → Hom 𝓒 A B ≅ Hom 𝓓 (𝓕 ₀(A)) (𝓕 ₀(B)) [ 𝓢𝓮𝓽 ]
 
 module _ (𝓕 : 𝓒 ⟶ 𝓓) where
   Full∧Faithful→Embedding : Full 𝓕 → Faithful 𝓕 → Embedding 𝓕
@@ -24,25 +28,25 @@ module _ (𝓕 : 𝓒 ⟶ 𝓓) where
   Embedding→Full map = λ g → ∣ map ⁻¹ ∣ g , (isoʳ map <*> refl)
 
   Embedding→Faithful : Embedding 𝓕 → Faithful 𝓕
-  Embedding→Faithful map {x = f} {g} = λ hyp → begin
-    f                     ≡⟨ sym $ isoˡ map <*> refl   ⟩
+  Embedding→Faithful map {f = f} {g} = λ hyp → begin
+    f                       ≡⟨ sym $ isoˡ map <*> refl   ⟩
     ∣ map ⁻¹ ∣ (∣ map ∣ f)  ≡⟨ cong ∣ map ⁻¹ ∣ hyp ⟩
     ∣ map ⁻¹ ∣ (∣ map ∣ g)  ≡⟨ isoˡ map <*> refl ⟩
-    g                     ∎
+    g                       ∎
 
   reflect-≅ : Embedding 𝓕 → ∀ {A B} → 𝓕 ₀(A) ≅ 𝓕 ₀(B) [ 𝓓 ] → A ≅ B [ 𝓒 ]
   reflect-≅ map (-, g) = ∣ map ⁻¹ ∣ ∣ g ∣ , record
     { inverse = ∣ map ⁻¹ ∣ ∣ g ⁻¹ ∣
     ; isoˡ = Embedding→Faithful map $ begin
-      ∣ map ∣ (∣ map ⁻¹ ∣ ∣ g ⁻¹ ∣ ∘ ∣ map ⁻¹ ∣ ∣ g ∣)                  ≡⟨ resp-∘ 𝓕 ⟩
+      ∣ map ∣ (∣ map ⁻¹ ∣ ∣ g ⁻¹ ∣ ∘ ∣ map ⁻¹ ∣ ∣ g ∣)                    ≡⟨ resp-∘ 𝓕 ⟩
       ((∣ map ∣ ∘ ∣ map ⁻¹ ∣) ∣ g ⁻¹ ∣) ∘ ((∣ map ∣ ∘ ∣ map ⁻¹ ∣) ∣ g ∣)  ≡⟨ ⦇ (isoʳ map <*> refl) ∘ (isoʳ map <*> refl) ⦈ ⟩
-      ∣ g ⁻¹ ∣ ∘ ∣ g ∣                                              ≡⟨ isoˡ g ⟩
-      id                                                          ≡⟨ sym $ resp-id 𝓕 ⟩
-      ∣ map ∣ id                                                  ∎
+      ∣ g ⁻¹ ∣ ∘ ∣ g ∣                                                    ≡⟨ isoˡ g ⟩
+      id                                                                  ≡⟨ sym $ resp-id 𝓕 ⟩
+      ∣ map ∣ id                                                          ∎
     ; isoʳ = Embedding→Faithful map $ begin
-      ∣ map ∣ (∣ map ⁻¹ ∣ ∣ g ∣ ∘ ∣ map ⁻¹ ∣ ∣ g ⁻¹ ∣)                  ≡⟨ resp-∘ 𝓕 ⟩
+      ∣ map ∣ (∣ map ⁻¹ ∣ ∣ g ∣ ∘ ∣ map ⁻¹ ∣ ∣ g ⁻¹ ∣)                    ≡⟨ resp-∘ 𝓕 ⟩
       ((∣ map ∣ ∘ ∣ map ⁻¹ ∣) ∣ g ∣) ∘ ((∣ map ∣ ∘ ∣ map ⁻¹ ∣) ∣ g ⁻¹ ∣)  ≡⟨ ⦇ (isoʳ map <*> refl) ∘ (isoʳ map <*> refl) ⦈ ⟩
-      ∣ g ∣ ∘ ∣ g ⁻¹ ∣                                              ≡⟨ isoʳ g ⟩
-      id                                                          ≡⟨ sym $ resp-id 𝓕 ⟩
-      ∣ map ∣ id                                                  ∎
+      ∣ g ∣ ∘ ∣ g ⁻¹ ∣                                                    ≡⟨ isoʳ g ⟩
+      id                                                                  ≡⟨ sym $ resp-id 𝓕 ⟩
+      ∣ map ∣ id                                                          ∎
     }

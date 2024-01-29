@@ -2,7 +2,7 @@
 module Functor.Base where
 open import Prelude
 open import Category.Base
-open import Isomorphism
+open import Category.Isomorphism
 
 record Functor (𝓒 𝓓 : Category) : Set where
   field
@@ -68,18 +68,6 @@ functor⁼ {𝓒} {𝓓} {𝓕} {𝓖} (refl , refl) =
             ≡ record { map₀ = 𝓖 ₀_; map₁ = 𝓖 ₁_; resp-id = 𝓖-resp-id; resp-∘ = 𝓖-resp-∘ }
             [ 𝓒 ⟶ 𝓓 ]
     lemma refl refl = refl
-
-Injective : ∀ {A B} → (A → B) → Set
-Injective f = ∀ {x y} → f x ≡ f y → x ≡ y
-
-Surjective : ∀ {A B} → (A → B) → Set
-Surjective f = ∀ y → ∃[ x ] f x ≡ y
-
-Faithful : ∀ {𝓒 𝓓} → 𝓒 ⟶ 𝓓 → Set
-Faithful 𝓕 = ∀ {A B} → Injective (map₁ 𝓕 {A} {B})
-
-Full : ∀ {𝓒 𝓓} → 𝓒 ⟶ 𝓓 → Set
-Full 𝓕 = ∀ {A B} → Surjective (map₁ 𝓕 {A} {B})
 
 private
   identity : ∀ {𝓒} → 𝓒 ⟶ 𝓒

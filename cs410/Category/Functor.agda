@@ -2,7 +2,7 @@ open import Category.Base
 module Category.Functor (𝓒 𝓓 : Category) where
 open import Prelude
 open import Functor.Base
-open import NaturalTransformation.Base
+open import Natural.Base
 
 𝓕𝓾𝓷 : Category
 𝓕𝓾𝓷 = record

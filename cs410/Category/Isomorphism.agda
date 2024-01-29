@@ -1,4 +1,4 @@
-module Isomorphism where
+module Category.Isomorphism where
 open import Prelude
 open import Category.Base
 
@@ -81,7 +81,7 @@ infix 4 ≅-syntax
 syntax ≅-syntax 𝓒 A B = A ≅ B [ 𝓒 ]
 
 ≅-sym : ∀ {𝓒 A B} → A ≅ B [ 𝓒 ] → B ≅ A [ 𝓒 ]
-≅-sym (-, f) = ∣ f ⁻¹ ∣ , record
+≅-sym (-, f) = -, record
   { inverse = ∣ f ∣
   ; isoˡ = isoʳ f
   ; isoʳ = isoˡ f
