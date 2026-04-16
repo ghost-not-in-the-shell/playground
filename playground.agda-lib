@@ -1,0 +1,7 @@
+name: playground
+include:
+  src
+flags:
+  --cubical
+  --no-load-primitives
+  --type-in-type
