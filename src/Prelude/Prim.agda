@@ -86,8 +86,7 @@ private module Partial where
     primSubOut : ∀ {ℓ} {A : Type ℓ} {φ : 𝔽} {u : Partial φ A}
       → A [ φ ↦ u ] → A
 
-open Partial public
-  renaming ( primSubOut to outS )
+open Partial public renaming ( primSubOut to outS )
 
 private module Kan where
   primitive

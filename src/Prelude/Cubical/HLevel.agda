@@ -157,6 +157,9 @@ iso→is-hlevel : ∀ n → A ≅ B → is-hlevel A n → is-hlevel B n
 iso→is-hlevel n (fwd f) h =
   retract→is-hlevel n f (f ⁻¹) (λ x → ap (_$ x) (∘-invʳ f)) h
 
+iso→is-set : A ≅ B → is-set A → is-set B
+iso→is-set = iso→is-hlevel 2
+
 Π-is-contr : (∀ x → is-contr (P x)) → is-contr (∀ x → P x)
 Π-is-contr h = record
   { centre  = λ x → h x .centre
@@ -236,3 +239,9 @@ iso→is-hlevel n (fwd f) h =
 
 ×-is-hlevel : ∀ n → is-hlevel A n → is-hlevel B n → is-hlevel (A × B) n
 ×-is-hlevel n ncube₁ ncube₂ = Σ-is-hlevel n ncube₁ (const ncube₂)
+
+Σ-is-set : is-set A → (∀ x → is-set (P x)) → is-set (Σ A P)
+Σ-is-set = Σ-is-hlevel 2
+
+×-is-set : is-set A → is-set B → is-set (A × B)
+×-is-set = ×-is-hlevel 2
