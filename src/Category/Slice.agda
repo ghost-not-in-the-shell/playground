@@ -88,6 +88,36 @@ _/_ : ∀ 𝓒 I → Category
   ; ∘-assoc = ext (∘-assoc 𝓒)
   }
 
+module _ {𝓒 A} where
+  open import Diagram.Product
+  open import Diagram.Product.Properties
+  open import Functor.Base
+  open import Functor.Bifunctor
+
+  forget/ : 𝓒 / A ⟶ 𝓒
+  forget/ = record
+    { map₀ = λ (ΣAB , π) → ΣAB
+    ; map₁ = λ (f , f-vertical) → f
+    ; resp-id = refl
+    ; resp-∘  = refl
+    }
+
+  constant-family : ⦃ BinaryProduct 𝓒 ⦄ → 𝓒 ⟶ 𝓒 / A
+  constant-family =
+    let instance _ = ×.productOp 𝓒
+    in record
+    { map₀ = λ B → A × B , π₁
+    ; map₁ = λ f → record
+      { morphism = id ×₁ f
+      ; vertical = begin
+                    π₁            ≡⟨ ∘-idˡ 𝓒 ⟨
+               id ∘ π₁            ≡⟨ ×.commute₁ 𝓒 ⟨
+        π₁ ∘ < id ∘ π₁ , f ∘ π₂ > ∎
+      }
+    ; resp-id = ext $ resp-id (A ×-)
+    ; resp-∘  = ext $ resp-∘  (A ×-)
+    }
+
 module DependentSum 𝓒 where
   open import Functor.Base
 

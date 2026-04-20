@@ -21,6 +21,10 @@ record is-pullback {I A B A⊗B}
       → (⁇-commute₂ : q ∘ ⁇ ≡ g)
       → ⁇ ≡ < f [ □ ] g >′
 
+  <_[]_>′ : ∀ {X} (f : 𝓒 ⦅ X , A ⦆) (g : 𝓒 ⦅ X , B ⦆) {□ : a ∘ f ≡ b ∘ g}
+    → 𝓒 ⦅ X , A⊗B ⦆
+  <_[]_>′ f g {□} = < f [ □ ] g >′
+
   unique₂ : ∀ {X} {f : 𝓒 ⦅ X , A ⦆} {g : 𝓒 ⦅ X , B ⦆} {□ : a ∘ f ≡ b ∘ g}
     → {⁇₁ ⁇₂ : 𝓒 ⦅ X , A⊗B ⦆}
     → (⁇₁-commute₁ : p ∘ ⁇₁ ≡ f) (⁇₁-commute₂ : q ∘ ⁇₁ ≡ g)
@@ -44,15 +48,15 @@ record Pullbacks : Type where
   field
     has-all-pullbacks : ∀ {I A B} (a : 𝓒 ⦅ A , I ⦆) (b : 𝓒 ⦅ B , I ⦆) → Pullback a b
 
-instance
-  pullbackOp : ⦃ _ : Pullbacks ⦄ → PullbackOp (Hom 𝓒)
-  pullbackOp ⦃ pullback-instance pull ⦄ = record
-    { ⊗₍₎   = λ A B  a   b  → apex    (pull a b) 
-    ; p     = λ {a = a} {b} → p       (pull a b)
-    ; q     = λ {a = a} {b} → q       (pull a b)
-    ; <[-]> = λ {a = a} {b} → mediate (pull a b)
-    } where open Pullback
-
 module ⊗ ⦃ (pullback-instance pull) : Pullbacks ⦄ where
   module _ {I A B} {a : 𝓒 ⦅ A , I ⦆} {b : 𝓒 ⦅ B , I ⦆} where
     open Pullback (pull a b) public hiding (apex; p; q)
+
+  instance
+    pullbackOp : PullbackOp (Hom 𝓒)
+    pullbackOp = record
+      { ⊗₍₎   = λ A B  a   b  → apex    (pull a b)
+      ; p     = λ {a = a} {b} → p       (pull a b)
+      ; q     = λ {a = a} {b} → q       (pull a b)
+      ; <[-]> = λ {a = a} {b} → mediate (pull a b)
+      } where open Pullback

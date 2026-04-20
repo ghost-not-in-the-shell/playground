@@ -2,10 +2,11 @@ open import Diagram.Product
 module Diagram.Exponential 𝓒 ⦃ _ : BinaryProduct 𝓒 ⦄ where
 open import Prelude
 open import Category.Base
+open import Diagram.Product.Properties
 open import Functor.Base
 
 private instance
-  _ = productOp 𝓒
+  _ = ×.productOp 𝓒
 
 record is-exponential {A B A⇒B} (ev : 𝓒 ⦅ A⇒B × A , B ⦆) : Type where
   field
@@ -36,7 +37,7 @@ record is-exponential {A B A⇒B} (ev : 𝓒 ⦅ A⇒B × A , B ⦆) : Type wher
 
   eta : lam′ ev ≡ id
   eta = sym $ unique $ begin
-    ev ∘ id ×₁ id ≡⟨ - ○ resp-id (×.functorial 𝓒) ⟩
+    ev ∘ id ×₁ id ≡⟨ - ○ resp-id -×- ⟩
     ev ∘    id    ≡⟨ ∘-idʳ 𝓒 ⟩
     ev            ∎
 
@@ -55,17 +56,18 @@ record Exponentials : Type where
   field
     has-all-exponentials : ∀ A B → Exponential A B
 
-instance
-  exponentialOp : ⦃ _ : Exponentials ⦄ → ExponentialOp (Hom 𝓒)
-  exponentialOp ⦃ exponential-instance exp ⦄ = record
-    { _⇒_ = λ  A       B  → apex    (exp A B)
-    ; ev  = λ {A = A} {B} → ev      (exp A B)
-    ; lam = λ {A = A} {B} → mediate (exp A B)
-    } where open Exponential
-
 module ⇒ ⦃ (exponential-instance exp) : Exponentials ⦄ where
   module _ {A B} where
     open Exponential (exp A B) public hiding (apex; ev)
+
+  instance
+    exponentialOp : ExponentialOp (Hom 𝓒)
+    exponentialOp = record
+      { _⇒_ = λ  A       B  → apex    (exp A B)
+      ; ev  = λ {A = A} {B} → ev      (exp A B)
+      ; lam = λ {A = A} {B} → mediate (exp A B)
+      } where open Exponential
+
 
 {-
   functorial : (𝓒 ᵒᵖ) × 𝓒 ⟶ 𝓒

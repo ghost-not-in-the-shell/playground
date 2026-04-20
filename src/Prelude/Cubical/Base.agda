@@ -42,12 +42,12 @@ apd f a = λ i → f i (a i)
 pure : ∀ {A} (a : A) → a ≡ a
 pure _ = refl
 
-module Applicative where
+module ApplicativeReasoning where
   infixl 4 _<*>_
-  _<*>_ : ∀ {A} {B : A → Type} {f₀ f₁ : (x : A) → B x} {a₀ a₁}
+  _<*>_ : ∀ {A B} {f₀ f₁ : A → B} {a₀ a₁}
     → (f : f₀ ≡    f₁)
     → (a : a₀ ≡    a₁)
-    →   f₀ a₀ ≡ f₁ a₁ [ i ↦ B (a i)]
+    →   f₀ a₀ ≡ f₁ a₁
   f <*> a = λ i → f i (a i)
 
 module ApplicativeP where
@@ -59,7 +59,7 @@ module ApplicativeP where
     → (f : f₀ ≡    f₁ [ i ↦ ((x : A i) → B i x) ])
     → (a : a₀ ≡    a₁ [ i ↦ A i                 ])
     →   f₀ a₀ ≡ f₁ a₁ [ i ↦ B i (a i)           ]
-  f <*> a = λ i → f i (a i)
+  f <*> a = apd (λ i → f i) a
 
 coe : ∀ {A₀ A₁} → A₀ ≡ A₁ → A₀ → A₁
 coe A a = transp (λ i → A i) i0 a

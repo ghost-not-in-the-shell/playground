@@ -16,13 +16,13 @@ record Terminal : Type where
   unique : ∀ {X} {⁇ : 𝓒 ⦅ X , apex ⦆} → ⁇ ≡ !′
   unique {X} {⁇} = sym (terminal X .connect ⁇)
 
-instance
-  terminalOp : ⦃ _ : Terminal ⦄ → TerminalOp (Hom 𝓒)
-  terminalOp ⦃ term ⦄ = record
-    { 𝟙 = apex term
-    ; ! = !′   term
-    } where open Terminal
-
 module 𝟙 ⦃ term : Terminal ⦄ where
   module _ where
     open Terminal term public hiding (apex; !′)
+
+  instance
+    terminalOp : TerminalOp (Hom 𝓒)
+    terminalOp = record
+      { 𝟙 = apex term
+      ; ! = !′   term
+      } where open Terminal

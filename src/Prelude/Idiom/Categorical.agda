@@ -38,7 +38,7 @@ module _ {Ob : Type} where
   open ProductOp ⦃...⦄ public
 
   record ExponentialOp (Hom : Ob → Ob → Type) ⦃ _ : ProductOp Hom ⦄ : Type where
-    infixr 5 _⇒_
+    infixr 5 _⇒_ _⇒₁_
     field
       _⇒_ : Ob → Ob → Ob
       ev  : ∀ {A B} → Hom ((A ⇒ B) × A) B
@@ -114,7 +114,7 @@ module _ {Ob : Type} where
 {-# DISPLAY PullbackOp.<_[]_>  _       = <_[]_>         #-}
 
 record Opposite (A : Type) (Aᵒᵖ : Type) : Type where
-  infix 5 opposite
+  infix 8 opposite
   field
     opposite : A → Aᵒᵖ
 
@@ -132,7 +132,7 @@ record is-iso {Ob : Type} (Hom : Ob → Ob → Type) ⦃ _ : CompositionalOp Hom
     ∘-invʳ : f ∘ f⁻¹ ≡ id
 
 module _ {Ob : Type} {Hom : Ob → Ob → Type} ⦃ _ : CompositionalOp Hom ⦄ {A B : Ob} (f : Hom A B) ⦃ iso : is-iso Hom f ⦄ where
-  infix 5 _⁻¹
+  infix 8 _⁻¹
   _⁻¹ = is-iso.bwd iso
   ∘-invˡ = is-iso.∘-invˡ iso
   ∘-invʳ = is-iso.∘-invʳ iso

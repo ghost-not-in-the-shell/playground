@@ -1,5 +1,5 @@
 open import Diagram.Pullback
-module Diagram.Pullback.Functor 𝓒 ⦃ _ : Pullbacks 𝓒 ⦄ where
+module Diagram.Pullback.Functor {𝓒} ⦃ _ : Pullbacks 𝓒 ⦄ where
 open import Prelude
 open import Category.Base
 open import Category.Slice
