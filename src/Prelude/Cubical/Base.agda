@@ -1,11 +1,8 @@
 module Prelude.Cubical.Base where
-open import Prelude.Prim
+open import Prelude.Prim renaming (≡-refl to refl)
 open import Prelude.Idiom hiding (refl; sym; trans)
 
 private
-  refl : ∀ {A} {a : A} → a ≡ a
-  refl {a = a} = λ i → a
-
   sym : ∀ {A} {a₀ a₁ : A} → a₀ ≡ a₁ → a₁ ≡ a₀
   sym a = λ i → a (~ i)
 
@@ -65,7 +62,7 @@ coe : ∀ {A₀ A₁} → A₀ ≡ A₁ → A₀ → A₁
 coe A a = transp (λ i → A i) i0 a
 
 subst : ∀ {A} (P : A → Type) {a₀ a₁} → a₀ ≡ a₁ → P a₀ → P a₁
-subst P a u = coe (ap P a) u
+subst P a u = coe (cong P a) u
 
 subst₂ : ∀ {A} {B : A → Type} (P : (x : A) → B x → Type)
   → {a₀ a₁ : A} {b₀ : B a₀} {b₁ : B a₁}

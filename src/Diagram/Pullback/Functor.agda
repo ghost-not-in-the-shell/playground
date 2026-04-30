@@ -6,7 +6,7 @@ open import Category.Slice
 open import Functor.Base
 
 private instance
-  _ = pullbackOp 𝓒
+  _ = ⊗.pullbackOp 𝓒
 
 _* : ∀ {I J} → 𝓒 ᵒᵖ ⦅ I , J ⦆ → 𝓒 / I ⟶ 𝓒 / J
 _* {I} {J} u = record

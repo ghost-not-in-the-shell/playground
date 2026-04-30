@@ -17,9 +17,9 @@ record is-product {A B A×B} (π₁ : 𝓒 ⦅ A×B , A ⦆) (π₂ : 𝓒 ⦅ A
       → (⁇-commute₂ : π₂ ∘ ⁇ ≡ g)
       → ⁇ ≡ < f , g >′
 
-  <>∘ : ∀ {X Y} {g₁ : 𝓒 ⦅ Y , A ⦆} {g₂ : 𝓒 ⦅ Y , B ⦆} {f : 𝓒 ⦅ X , Y ⦆}
+  <>∘ : ∀ {X Y} {f : 𝓒 ⦅ X , Y ⦆} {g₁ : 𝓒 ⦅ Y , A ⦆} {g₂ : 𝓒 ⦅ Y , B ⦆}
     → < g₁ , g₂ >′ ∘ f ≡ < g₁ ∘ f , g₂ ∘ f >′
-  <>∘ {g₁ = g₁} {g₂} {f} = unique
+  <>∘ {f = f} {g₁} {g₂} = unique
     (begin
       π₁ ∘(< g₁ , g₂ >′ ∘ f) ≡⟨ ∘-assoc 𝓒 ⟨
      (π₁ ∘ < g₁ , g₂ >′)∘ f  ≡⟨ commute₁ ○ - ⟩

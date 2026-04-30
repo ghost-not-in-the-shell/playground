@@ -10,19 +10,22 @@ record Terminal : Type where
     apex : Ob 𝓒
     terminal : is-terminal apex
 
-  !′ : ∀ {X} → 𝓒 ⦅ X , apex ⦆
-  !′ {X} = terminal X .centre
+  <>′ : ∀ {X} → 𝓒 ⦅ X , apex ⦆
+  <>′ {X} = terminal X .centre
 
-  unique : ∀ {X} {⁇ : 𝓒 ⦅ X , apex ⦆} → ⁇ ≡ !′
+  unique : ∀ {X} {⁇ : 𝓒 ⦅ X , apex ⦆} → ⁇ ≡ <>′
   unique {X} {⁇} = sym (terminal X .connect ⁇)
+
+  unique₂ : ∀ {X} {⁇₁ ⁇₂ : 𝓒 ⦅ X , apex ⦆} → ⁇₁ ≡ ⁇₂
+  unique₂ {⁇₁ = ⁇₁} {⁇₂} = trans unique (sym unique)
 
 module 𝟙 ⦃ term : Terminal ⦄ where
   module _ where
-    open Terminal term public hiding (apex; !′)
+    open Terminal term public hiding (apex; <>′)
 
   instance
     terminalOp : TerminalOp (Hom 𝓒)
     terminalOp = record
-      { 𝟙 = apex term
-      ; ! = !′   term
+      { 𝟙  = apex term
+      ; <> = <>′  term
       } where open Terminal

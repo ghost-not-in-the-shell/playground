@@ -34,6 +34,27 @@ record is-pullback {I A B A⊗B}
     trans (unique {□ = □} ⁇₁-commute₁ ⁇₁-commute₂)
     $ sym (unique {□ = □} ⁇₂-commute₁ ⁇₂-commute₂)
 
+  <[]>∘ : ∀ {X Y} {f : 𝓒 ⦅ X , Y ⦆} {g₁ : 𝓒 ⦅ Y , A ⦆} {g₂ : 𝓒 ⦅ Y , B ⦆} {□ : a ∘ g₁ ≡ b ∘ g₂} {□′ : a ∘ (g₁ ∘ f) ≡ b ∘ (g₂ ∘ f)}
+    → let □∘f : a ∘ (g₁ ∘ f) ≡ b ∘ (g₂ ∘ f)
+          □∘f = begin
+            a ∘(g₁ ∘ f) ≡⟨ ∘-assoc 𝓒 ⟨
+           (a ∘ g₁)∘ f  ≡⟨ □ ○ - ⟩
+           (b ∘ g₂)∘ f  ≡⟨ ∘-assoc 𝓒 ⟩
+            b ∘(g₂ ∘ f) ∎
+      in < g₁ [ □ ] g₂ >′ ∘ f ≡ < g₁ ∘ f [ □∘f ] g₂ ∘ f >′
+  <[]>∘ {f = f} {g₁} {g₂} = unique
+    (begin
+      p ∘(< g₁ [] g₂ >′ ∘ f) ≡⟨ ∘-assoc 𝓒 ⟨
+     (p ∘ < g₁ [] g₂ >′)∘ f  ≡⟨ commute₁ ○ - ⟩
+            g₁          ∘ f  ∎)
+    (begin
+      q ∘(< g₁ [] g₂ >′ ∘ f) ≡⟨ ∘-assoc 𝓒 ⟨
+     (q ∘ < g₁ [] g₂ >′)∘ f  ≡⟨ commute₂ ○ - ⟩
+                  g₂    ∘ f  ∎)
+
+  eta : {□ : a ∘ p ≡ b ∘ q} → < p [ □ ] q >′ ≡ id
+  eta = sym $ unique (∘-idʳ 𝓒) (∘-idʳ 𝓒)
+
 record Pullback {I A B} (a : 𝓒 ⦅ A , I ⦆) (b : 𝓒 ⦅ B , I ⦆) : Type where
   field
     apex : Ob 𝓒

@@ -114,7 +114,7 @@ retract→is-contr : (f : A → B) (g : B → A) (retract : ∀ x → f (g x) �
 retract→is-contr f g r (centre , connect) = record
   { centre = f centre
   ; connect = λ x → begin
-    f centre ≡⟨ ap f (connect (g x)) ⟩
+    f centre ≡⟨ cong f (connect (g x)) ⟩
     f(g x)   ≡⟨ r x ⟩
         x    ∎
   }
@@ -135,7 +135,7 @@ retract→is-set f g r square = λ x y p q i j →
        ; k (i = i1) → r (q j) k
        ; k (j = i0) → r x k
        ; k (j = i1) → r y k })
-    (f (square (g x) (g y) (ap g p) (ap g q) i j))
+    (f (square (g x) (g y) (cong g p) (cong g q) i j))
 
 retract→is-hlevel : ∀ n (f : A → B) (g : B → A) (retract : ∀ x → f (g x) ≡ x)
   → is-hlevel A n → is-hlevel B n
@@ -146,7 +146,7 @@ retract→is-hlevel (suc (suc n)) f g r ncube = λ x y →
     (λ ncube i → hcomp (λ { j (i = i0) → r x j
                           ; j (i = i1) → r y j })
                        (f (ncube i)))
-    (ap g)
+    (cong g)
     (λ ncube i j → hcomp (λ { k (i = i1) → ncube j
                             ; k (j = i0) → r x (i ∨ k)
                             ; k (j = i1) → r y (i ∨ k) })
@@ -155,7 +155,7 @@ retract→is-hlevel (suc (suc n)) f g r ncube = λ x y →
 
 iso→is-hlevel : ∀ n → A ≅ B → is-hlevel A n → is-hlevel B n
 iso→is-hlevel n (fwd f) h =
-  retract→is-hlevel n f (f ⁻¹) (λ x → ap (_$ x) (∘-invʳ f)) h
+  retract→is-hlevel n f (f ⁻¹) (λ x → cong (_$ x) (∘-invʳ f)) h
 
 iso→is-set : A ≅ B → is-set A → is-set B
 iso→is-set = iso→is-hlevel 2
@@ -169,8 +169,16 @@ iso→is-set = iso→is-hlevel 2
 Π-is-prop : (∀ x → is-prop (P x)) → is-prop (∀ x → P x)
 Π-is-prop path = λ f g i x → path x (f x) (g x) i
 
+Πᵢ-is-prop : (∀ {x} → is-prop (P x)) → is-prop (∀ {x} → P x)
+Πᵢ-is-prop path = λ f g i {x} → path {x} (f {x}) (g {x}) i
+
 Π-is-set : (∀ x → is-set (P x)) → is-set (∀ x → P x)
-Π-is-set square = λ f g p q i j x → square x (f x) (g x) (ap (_$ x) p) (ap (_$ x) q) i j
+Π-is-set square = λ f g p q i j x →
+  square x (f x) (g x) (cong (_$ x) p) (cong (_$ x) q) i j
+
+Πᵢ-is-set : (∀ {x} → is-set (P x)) → is-set (∀ {x} → P x)
+Πᵢ-is-set {P = P} square = λ (f g : ∀ {x} → P x) (p q : f ≡ g [ i ↦ (∀ {x} → P x) ]) i j {x} →
+  square {x} (f {x}) (g {x}) (cong (λ - → - {x}) p) (cong (λ - → - {x}) q) i j
 
 Π-Path-intro : {f g : ∀ x → P x} → (∀ x → f x ≡ g x) → f ≡ g
 Π-Path-intro p i x = p x i

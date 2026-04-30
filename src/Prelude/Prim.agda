@@ -136,6 +136,9 @@ private module Path where
 
   {-# BUILTIN PATH _≡_ #-}
 
+  ≡-refl : ∀ {ℓ} {A : Type ℓ} {a : A} → a ≡ a
+  ≡-refl {a = a} = λ i → a
+
 open Path public
 
 private module Data where
@@ -148,6 +151,15 @@ private module Data where
 
   data Bool : Type where
     false true : Bool
+
+  {-# BUILTIN BOOL  Bool  #-}
+  {-# BUILTIN FALSE false #-}
+  {-# BUILTIN TRUE  true  #-}
+
+  infix 0 if_then_else_
+  if_then_else_ : ∀ {ℓ} {P : Bool → Type ℓ} (b : Bool) → P true → P false → P b
+  if true  then t else f = t
+  if false then t else f = f
 
   data Nat : Type where
     zero : Nat
@@ -178,6 +190,32 @@ private module Data where
   Σ-syntax : ∀ {ℓ₁ ℓ₂} (A : Type ℓ₁) (B : A → Type ℓ₂) → Type (ℓ₁ ⊔ ℓ₂)
   Σ-syntax = Σ
   syntax Σ-syntax A (λ x → B) = Σ[ x ∈ A ] B
+
+  infixr 5 _∷_
+  data List {ℓ} (A : Type ℓ) : Type ℓ where
+    []  : List A
+    _∷_ : A → List A → List A
+
+  {-# BUILTIN LIST List #-}
+
+  data Maybe {ℓ} (A : Type ℓ) : Type ℓ where
+    nothing : Maybe A
+    just    : A → Maybe A
+
+  {-# BUILTIN MAYBE Maybe #-}
+
+  -- Reflection
+  postulate Char  : Type
+  {-# BUILTIN CHAR Char #-}
+
+  postulate Float : Type
+  {-# BUILTIN FLOAT Float #-}
+
+  postulate String : Type
+  {-# BUILTIN STRING String #-}
+
+  postulate Word : Type
+  {-# BUILTIN WORD64 Word #-}
 
 open Data public
 

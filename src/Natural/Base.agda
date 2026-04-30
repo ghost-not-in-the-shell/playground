@@ -4,6 +4,7 @@ open import Category.Base
 open import Functor.Base
 
 record NaturalTransformation {𝓒 𝓓} (𝐹 𝐺 : 𝓒 ⟶ 𝓓) : Type where
+  constructor _,_
   field
     component : ∀ {A} → 𝓓 ⦅ 𝐹 ₀(A) , 𝐺 ₀(A) ⦆
   private η = component
@@ -25,6 +26,29 @@ instance
   natural-funlike = funlike-instance λ η A → η .component
 
 {-# DISPLAY component α = α ▴ #-}
+
+NaturalTransformation-is-set : ∀ {𝓒 𝓓} {𝐹 𝐺 : 𝓒 ⟶ 𝓓} → is-set (𝐹 ⟹ 𝐺)
+NaturalTransformation-is-set {𝓒} {𝓓} {𝐹} {𝐺} = iso→is-set iso NaturalTransformation′-is-set
+  where NaturalTransformation′ : Type
+        NaturalTransformation′ =
+          Σ[ η ∈ (∀ {A} → 𝓓 ⦅ 𝐹 ₀(A) , 𝐺 ₀(A) ⦆) ]
+            ∀ {A B} {f : 𝓒 ⦅ A , B ⦆} → η ∘ 𝐹 ₁(f) ≡ 𝐺 ₁(f) ∘ η
+
+        NaturalTransformation′-is-set : is-set NaturalTransformation′
+        NaturalTransformation′-is-set =
+          Σ-is-set (Πᵢ-is-set (Hom-set 𝓓))
+            λ η → is-prop→is-set $ Πᵢ-is-prop $ Πᵢ-is-prop $ Πᵢ-is-prop
+              λ {f} → Hom-set 𝓓 (η ∘ 𝐹 ₁(f)) (𝐺 ₁(f) ∘ η)
+
+        iso : NaturalTransformation′ ≅ NaturalTransformation 𝐹 𝐺
+        iso = record
+          { fwd = λ (η , natural) → (η , natural)
+          ; iso = record
+            { bwd = λ (η , natural) → (η , natural)
+            ; ∘-invˡ = refl
+            ; ∘-invʳ = refl
+            }
+          }
 
 module _ {𝓒 𝓓} where
   private
@@ -51,6 +75,18 @@ module _ {𝓒 𝓓} where
     𝓕𝓾𝓷-compositionalOp = record
       { id  = id′
       ; _∘_ = _∘′_
+      }
+
+    NaturalTransformation-extensional : {𝐹 𝐺 : 𝓒 ⟶ 𝓓} → Extensional (𝐹 ⟹ 𝐺)
+    NaturalTransformation-extensional {𝐹} {𝐺} = record
+      { _≈_ = λ α β → {A : Ob 𝓒} → α ₍ A ₎ ≡ β ₍ A ₎
+      ; ext = λ {(α , α-natural)} {(β , β-natural)} p i → record
+        { component = p i
+        ; natural = λ {A} {B} {f} →
+          is-prop→PathP
+            (λ i → Hom-set 𝓓 (p i ∘ 𝐹 ₁(f)) (𝐺 ₁(f) ∘ p i))
+            α-natural β-natural i
+        }
       }
 
 module 2-dimensional {𝓒 𝓓 𝓔} where
@@ -86,3 +122,16 @@ module 2-dimensional {𝓒 𝓓 𝓔} where
   syntax horizontal α β = α ∗ β
 
 open 2-dimensional public
+
+𝓕𝓾𝓷 : Category → Category → Category
+𝓕𝓾𝓷 𝓒 𝓓 = record
+  { Ob = 𝓒 ⟶ 𝓓
+  ; Hom = NaturalTransformation
+  ; Hom-set = NaturalTransformation-is-set
+  ; ∘-idˡ   = ext λ {A} → ∘-idˡ   𝓓
+  ; ∘-idʳ   = ext λ {A} → ∘-idʳ   𝓓
+  ; ∘-assoc = ext λ {A} → ∘-assoc 𝓓
+  }
+
+[_,_] = 𝓕𝓾𝓷
+{-# DISPLAY 𝓕𝓾𝓷 = [_,_] #-}

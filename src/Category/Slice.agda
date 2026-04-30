@@ -68,12 +68,14 @@ module _ {𝓒} {I} where
       ; _∘_ = _∘′_
       }
 
-    /Hom-extensional : ∀ {Aᵢ Bᵢ} → Extensional (𝓒 / I -⦅ Aᵢ , Bᵢ ⦆)
+    /Hom-extensional : {Aᵢ@(A , a) Bᵢ@(B , b) : 𝓒 / I -Ob}
+      → ⦃ _ : Extensional (𝓒 ⦅ A , B ⦆) ⦄
+      → Extensional (𝓒 / I -⦅ Aᵢ , Bᵢ ⦆)
     /Hom-extensional {A , a} {B , b} = record
-      { _≈_ = λ (f , _) (g , _) → f ≡ g
+      { _≈_ = λ (f , _) (g , _) → f ≈ g
       ; ext = λ {(f , f-vertical)} {(g , g-vertical)} p i → record
-        { morphism = p i
-        ; vertical = is-prop→PathP (λ i → Hom-set 𝓒 a (b ∘ p i))
+        { morphism = ext p i
+        ; vertical = is-prop→PathP (λ i → Hom-set 𝓒 a (b ∘ ext p i))
                        f-vertical g-vertical i
         }
       }
@@ -83,12 +85,12 @@ _/_ : ∀ 𝓒 I → Category
   { Ob      = 𝓒 / I -Ob
   ; Hom     = 𝓒 / I -⦅_,_⦆
   ; Hom-set = 𝓒 / I -Hom-set
-  ; ∘-idˡ   = ext (∘-idˡ 𝓒)
-  ; ∘-idʳ   = ext (∘-idʳ 𝓒)
+  ; ∘-idˡ   = ext (∘-idˡ   𝓒)
+  ; ∘-idʳ   = ext (∘-idʳ   𝓒)
   ; ∘-assoc = ext (∘-assoc 𝓒)
   }
 
-module _ {𝓒 A} where
+module _ {𝓒} A where
   open import Diagram.Product
   open import Diagram.Product.Properties
   open import Functor.Base
@@ -96,7 +98,7 @@ module _ {𝓒 A} where
 
   forget/ : 𝓒 / A ⟶ 𝓒
   forget/ = record
-    { map₀ = λ (ΣAB , π) → ΣAB
+    { map₀ = λ (A , a) → A
     ; map₁ = λ (f , f-vertical) → f
     ; resp-id = refl
     ; resp-∘  = refl
@@ -121,8 +123,8 @@ module _ {𝓒 A} where
 module DependentSum 𝓒 where
   open import Functor.Base
 
-  ∑ : ∀ {I J} (u : 𝓒 ⦅ I , J ⦆) → 𝓒 / I ⟶ 𝓒 / J
-  ∑ u = record
+  _! : ∀ {I J} (u : 𝓒 ⦅ I , J ⦆) → 𝓒 / I ⟶ 𝓒 / J
+  _! u = record
     { map₀ = λ (A , a) → A , u ∘ a
     ; map₁ = λ {(-, a)} {(-, b)} (f , f-vertical) → record
       { morphism = f

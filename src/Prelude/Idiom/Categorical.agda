@@ -15,8 +15,8 @@ module _ {Ob : Type} where
 
   record TerminalOp (Hom : Ob → Ob → Type) : Type where
     field
-      𝟙 : Ob
-      ! : ∀ {X} → Hom X 𝟙
+      𝟙  : Ob
+      <> : ∀ {X} → Hom X 𝟙
 
   open TerminalOp ⦃...⦄ public
 
@@ -42,17 +42,17 @@ module _ {Ob : Type} where
     field
       _⇒_ : Ob → Ob → Ob
       ev  : ∀ {A B} → Hom ((A ⇒ B) × A) B
-      lam : ∀ {Γ A B} (f : Hom (Γ × A) B) → Hom Γ (A ⇒ B)
+      ƛ   : ∀ {Γ A B} (f : Hom (Γ × A) B) → Hom Γ (A ⇒ B)
 
     app : ∀ ⦃ _ : CompositionalOp Hom ⦄ {Γ A B} (f : Hom Γ (A ⇒ B)) (x : Hom Γ A) → Hom Γ B
     app f x = ev ∘ < f , x >
 
-    unlam : ∀ ⦃ _ : CompositionalOp Hom ⦄ {Γ A B} (f : Hom Γ (A ⇒ B)) → Hom (Γ × A) B
-    unlam f = ev ∘ f ×₁ id
+    uncurry : ∀ ⦃ _ : CompositionalOp Hom ⦄ {Γ A B} (f : Hom Γ (A ⇒ B)) → Hom (Γ × A) B
+    uncurry f = ev ∘ f ×₁ id
 
     _⇒₁_ : ∀ ⦃ _ : CompositionalOp Hom ⦄ {A B C D}
       → Hom A B → Hom C D → Hom (B ⇒ C) (A ⇒ D)
-    f ⇒₁ g = lam (g ∘ ev ∘ id ×₁ f)
+    f ⇒₁ g = ƛ(g ∘ ev ∘ id ×₁ f)
 
   open ExponentialOp ⦃...⦄ public
 
@@ -88,8 +88,8 @@ module _ {Ob : Type} where
 {-# DISPLAY CompositionalOp._∘_   _ = _∘_   #-}
 {-# DISPLAY CompositionalOp.id₍_₎ _ = id₍_₎ #-}  
 
-{-# DISPLAY TerminalOp.𝟙 _ = 𝟙 #-}
-{-# DISPLAY TerminalOp.! _ = ! #-}
+{-# DISPLAY TerminalOp.𝟙  _ = 𝟙  #-}
+{-# DISPLAY TerminalOp.<> _ = <> #-}
 
 {-# DISPLAY ProductOp._×_   _ = _×_   #-}
 {-# DISPLAY ProductOp.π₁    _ = π₁    #-}
@@ -98,12 +98,12 @@ module _ {Ob : Type} where
 {-# DISPLAY ProductOp.swap  _ = swap  #-}
 {-# DISPLAY ProductOp._×₁_  _ = _×₁_  #-}
 
-{-# DISPLAY ExponentialOp._⇒_   _ = _⇒_   #-}
-{-# DISPLAY ExponentialOp.ev    _ = ev    #-}
-{-# DISPLAY ExponentialOp.lam   _ = lam   #-}
-{-# DISPLAY ExponentialOp.app   _ = app   #-}
-{-# DISPLAY ExponentialOp.unlam _ = unlam #-}
-{-# DISPLAY ExponentialOp._⇒₁_  _ = _⇒₁_  #-}
+{-# DISPLAY ExponentialOp._⇒_     _ = _⇒_     #-}
+{-# DISPLAY ExponentialOp.ev      _ = ev      #-}
+{-# DISPLAY ExponentialOp.ƛ       _ = ƛ       #-}
+{-# DISPLAY ExponentialOp.app     _ = app     #-}
+{-# DISPLAY ExponentialOp.uncurry _ = uncurry #-}
+{-# DISPLAY ExponentialOp._⇒₁_    _ = _⇒₁_    #-}
 
 {-# DISPLAY PullbackOp.⊗₍₎     _       = ⊗₍₎            #-}
 {-# DISPLAY PullbackOp.p       _       = p              #-}
