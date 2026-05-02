@@ -56,6 +56,7 @@ record is-pullback {I A B A⊗B}
   eta = sym $ unique (∘-idʳ 𝓒) (∘-idʳ 𝓒)
 
 record Pullback {I A B} (a : 𝓒 ⦅ A , I ⦆) (b : 𝓒 ⦅ B , I ⦆) : Type where
+  no-eta-equality
   field
     apex : Ob 𝓒
     p : 𝓒 ⦅ apex , A ⦆

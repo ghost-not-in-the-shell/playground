@@ -33,6 +33,7 @@ record is-product {A B A×B} (π₁ : 𝓒 ⦅ A×B , A ⦆) (π₂ : 𝓒 ⦅ A
   eta = sym $ unique (∘-idʳ 𝓒) (∘-idʳ 𝓒)
 
 record Product (A B : Ob 𝓒) : Type where
+  no-eta-equality
   field
     apex : Ob 𝓒
     π₁ : 𝓒 ⦅ apex , A ⦆
@@ -89,3 +90,13 @@ module × ⦃ (product-instance prod) : BinaryProduct ⦄ where
      (π₂ ∘ < π₂ , π₁ >)∘ < f , g >  ≡⟨ commute₂ ○ - ⟩
                   π₁   ∘ < f , g >  ≡⟨ commute₁ ⟩
                            f        ∎)
+
+  representable : ∀ {A B X} → Hom 𝓒 X (A × B) ≅ Hom 𝓒 X A × Hom 𝓒 X B
+  representable = record
+    { fwd = λ t → (π₁ ∘ t , π₂ ∘ t)
+    ; iso = record
+      { bwd = λ (t , u) → < t , u >
+      ; ∘-invˡ = ext λ t → sym (unique refl refl)
+      ; ∘-invʳ = ext λ (t , u) → cong₂ _,_ commute₁ commute₂
+      }
+    }

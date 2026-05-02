@@ -52,20 +52,20 @@ private module Partial where
 
   postulate
     always : i1 =i1
-    left   : (φ ψ : 𝔽) → φ =i1 → φ ∨ ψ =i1
-    right  : (φ ψ : 𝔽) → ψ =i1 → φ ∨ ψ =i1
+    injₗ : (φ ψ : 𝔽) → φ =i1 → φ ∨ ψ =i1
+    injᵣ : (φ ψ : 𝔽) → ψ =i1 → φ ∨ ψ =i1
 
   {-# BUILTIN ITISONE always #-}
-  {-# BUILTIN ISONE1  left   #-}
-  {-# BUILTIN ISONE2  right  #-}
+  {-# BUILTIN ISONE1  injₗ   #-}
+  {-# BUILTIN ISONE2  injᵣ   #-}
 
   {-# BUILTIN PARTIAL  Partial  #-}
   {-# BUILTIN PARTIALP PartialP #-}
 
   primitive
     primPOr : ∀ {ℓ} (φ ψ : 𝔽) {A : Partial (φ ∨ ψ) (Type ℓ)}
-      → (u : PartialP φ (λ φ=i1 → A (left  φ ψ φ=i1)))
-      → (v : PartialP ψ (λ ψ=i1 → A (right φ ψ ψ=i1)))
+      → (u : PartialP φ (λ φ=i1 → A (injₗ φ ψ φ=i1)))
+      → (v : PartialP ψ (λ ψ=i1 → A (injᵣ φ ψ ψ=i1)))
       → PartialP (φ ∨ ψ) A
 
   syntax primPOr φ ψ u v = [ φ ↦ u , ψ ↦ v ]

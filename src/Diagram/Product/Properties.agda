@@ -5,6 +5,7 @@ open import Diagram.Product 𝓒
 open ApplicativeReasoning
 
 module _ ⦃ _ : BinaryProduct ⦄ where
+  open import Adjoint.UnitCounit
   open import Functor.Base
   open import Functor.Bifunctor
   open ×
@@ -29,3 +30,27 @@ module _ ⦃ _ : BinaryProduct ⦄ where
 
   -×_ : Ob 𝓒 → 𝓒 ⟶ 𝓒
   -× B = _₀₍-,_₎ {𝓒} {𝓒} -×- B
+
+{-
+  Δ⊣× : Δ {𝓒} ⊣ -×-
+  Δ⊣× = record
+    { unit = record
+      { component = < id , id >
+      ; natural = λ { {f = f} → begin
+          < id , id > ∘ f ≡⟨ <>∘ ⟩
+          < id ∘ f , id ∘ f > ≡⟨ ⦇ < ∘-idˡʳ 𝓒 , ∘-idˡʳ 𝓒 > ⦈ ⟩
+          < f ∘ id , f ∘ id > ≡⟨ ×<> ⟨
+          f ×₁ f ∘ < id , id > ∎ }
+      }
+    ; counit = record
+      { component = π₁ , π₂
+      ; natural = cong₂ _,_ commute₁ commute₂
+      }
+    ; zig = cong₂ _,_ commute₁ commute₂
+    ; zag = begin
+        π₁ ×₁ π₂ ∘ < id , id > ≡⟨ ×<> ⟩
+      < π₁ ∘ id , π₂ ∘ id > ≡⟨ {!!} ⟩
+      < π₁      , π₂      > ≡⟨ {!!} ⟩
+        id ∎
+    }
+-}

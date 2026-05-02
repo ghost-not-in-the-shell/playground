@@ -4,6 +4,7 @@ open import Prelude.Cubical.Base
 open import Prelude.Cubical.HLevel
 
 record Extensional (A : Type) : Type where
+  no-eta-equality
   field
     _≈_ : A → A → Type
     ext : ∀ {x y} → x ≈ y → x ≡ y
@@ -12,6 +13,7 @@ open Extensional ⦃...⦄ public
 
 private variable
   A B : Type
+  P : A → Type
 
 instance
   default-extensional : Extensional A
@@ -21,6 +23,17 @@ instance
     }
 
   {-# INCOHERENT default-extensional #-}
+
+  Π-extensional : ⦃ ∀ {x} → Extensional (P x) ⦄
+    → Extensional (∀ x → P x)
+  Π-extensional = record
+    { _≈_ = _≈′_
+    ; ext = ext′
+    } where _≈′_ : (f g : ∀ x → P x) → Type
+            f ≈′ g = ∀ x → f x ≈ g x
+
+            ext′ : {f g : ∀ x → P x} → f ≈′ g → f ≡ g
+            ext′ p i x = ext (p x) i
 
 injection→extensional : is-set B
   → {f : A → B}

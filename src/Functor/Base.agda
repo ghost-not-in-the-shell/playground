@@ -3,6 +3,7 @@ open import Prelude
 open import Category.Base
 
 record Functor (𝓒 𝓓 : Category) : Type where
+  infix 6 map₀ map₁
   field
     map₀ : Ob 𝓒 → Ob 𝓓
   private 𝐹₀ = map₀
@@ -111,3 +112,11 @@ instance
     ; π₂ = λ {𝓒 𝓓} → π₂′ {𝓒} {𝓓}
     ; <_,_> = <_,_>′
     }
+
+Δ : 𝓒 ⟶ 𝓒 × 𝓒
+Δ = record
+  { map₀ = λ A → (A , A)
+  ; map₁ = λ f → (f , f)
+  ; resp-id = cong₂ _,_ refl refl
+  ; resp-∘  = cong₂ _,_ refl refl
+  }

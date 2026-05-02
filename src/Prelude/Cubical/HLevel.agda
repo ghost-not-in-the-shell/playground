@@ -253,3 +253,20 @@ iso→is-set = iso→is-hlevel 2
 
 ×-is-set : is-set A → is-set B → is-set (A × B)
 ×-is-set = ×-is-hlevel 2
+
+record _-Type (n : Nat) : Type where
+  no-eta-equality
+  constructor el
+  field
+    type   : Type
+    hlevel : is-hlevel type n
+
+open _-Type using (hlevel) public
+
+instance
+  n-Type-underlying : ∀ {n} → Underlying (n -Type)
+  n-Type-underlying = record
+    { ⌞_⌟ = _-Type.type
+    }
+
+Set = 2 -Type

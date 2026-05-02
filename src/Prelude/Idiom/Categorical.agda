@@ -156,7 +156,8 @@ instance
     ; π₂ = snd
     ; <_,_> = λ f g x → f x , g x
     }
-    
+
+infix 4 _≅_
 record _≅_ (A B : Type) : Type where
   constructor fwd
   field
