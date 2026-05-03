@@ -77,10 +77,10 @@ module Tactic where
 
   module _ 𝓒 {A B : Ob 𝓒} {f g : 𝓒 ⦅ A , B ⦆} where
     worker : Term → TC ⊤
-    worker goal = with-reconstructed true $ with-normalisation true $ with-reduce-defs (false , don't-reduce) do
-      “f” ← quote-term f >>= wait-for-type
-      “g” ← quote-term g
-      “𝓒” ← quote-term 𝓒
+    worker goal = withReconstructed true $ withNormalisation true $ withReduceDefs (false , don't-reduce) do
+      “f” ← quoteTC f >>= wait-for-type
+      “g” ← quoteTC g
+      “𝓒” ← quoteTC 𝓒
 
       unify goal (“equate” “𝓒” (translate “f”) (translate “g”))
 

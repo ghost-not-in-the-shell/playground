@@ -151,7 +151,7 @@ instance
 
   Type-productOp : ProductOp Function
   Type-productOp = record
-    { _×_ = λ A B → Σ A (λ _ → B)
+    { _×_ = λ A B → Σ A (const B)
     ; π₁ = fst
     ; π₂ = snd
     ; <_,_> = λ f g x → f x , g x

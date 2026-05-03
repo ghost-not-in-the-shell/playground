@@ -3,7 +3,7 @@ open import Prelude
 open import Category.Assoc
 open import Category.Base
 open import Functor.Base
-open import Natural.Base
+-- open import Natural.Base
 open ApplicativeReasoning
 
 record Bifunctor 𝓒 𝓓 𝓔 : Type where
@@ -104,6 +104,7 @@ module _ {𝓒 𝓓 𝓔 : Category} where
         𝐹 ₁(id , p) ∘ 𝐹 ₁(f , id) ∎ }
     }
 
+{-
   _₁₍_,-₎ : (𝐹 : 𝓒 × 𝓓 ⟶ 𝓔) {A B : Ob 𝓒} (f : 𝓒 ⦅ A , B ⦆) → 𝐹 ₀₍ A ,-₎ ⟹ 𝐹 ₀₍ B ,-₎
   𝐹 ₁₍ f ,-₎ = record
     { component = λ {S} → 𝐹 ₁(f , id)
@@ -163,3 +164,4 @@ module _ {𝓒 𝓓 𝓔 : Category} where
           𝐹 ₁(f , id) ∘ 𝐹 ₁(id , p) ∎
 
   open BinaturalTransformation public
+-}

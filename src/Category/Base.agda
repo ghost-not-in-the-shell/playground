@@ -20,7 +20,7 @@ record Category : Type where
 open Category public
 
 infix 5 _⦅_,_⦆
-_⦅_,_⦆ = Hom
+_⦅_,_⦆ = Category.Hom
 {-# DISPLAY Hom = _⦅_,_⦆ #-}
 
 private module Duality where
@@ -55,9 +55,9 @@ g ○ f = cong₂ _∘_ g f
 𝓢𝓮𝓽 : Category
 𝓢𝓮𝓽 = record
   { Ob      = Set
-  ; Hom     = λ A B → Function ⌞ A ⌟ ⌞ B ⌟
-  ; Hom-set = λ {A} {B} f g p q i j a →
-      hlevel B (f a) (g a) (cong (_$ a) p) (cong (_$ a) q) i j
+  ; Hom     = λ (A , squareA) (B , squareB) → Function A B
+  ; Hom-set = λ {(A , squareA)} {(B , squareB)} f g p q i j a →
+      squareB (f a) (g a) (cong (_$ a) p) (cong (_$ a) q) i j
   ; op = record
     { id  = id
     ; _∘_ = _∘_
@@ -69,6 +69,6 @@ g ○ f = cong₂ _∘_ g f
 
 HomSet : ∀ 𝓒 A B → Set
 HomSet 𝓒 A B = record
-  { type   = Hom 𝓒 A B
-  ; hlevel = Hom-set 𝓒
+  { fst = Hom 𝓒 A B
+  ; snd = Hom-set 𝓒
   }

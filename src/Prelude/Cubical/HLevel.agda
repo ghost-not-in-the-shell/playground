@@ -63,7 +63,7 @@ Path-is-hlevel (suc n) ncube x y = ncube x y
 PathP-is-hlevel : {A : 𝕀 → Type} (n : Nat) → is-hlevel (A i1) (suc n)
   → ∀ x y → is-hlevel (PathP A x y) n
 PathP-is-hlevel {A = A} n ncube x y =
-  subst (λ - → is-hlevel - n) (sym (PathP≡Path0→1 A x y))
+  subst (λ A → is-hlevel A n) (sym (PathP≡Path0→1 A x y))
     $ Path-is-hlevel n ncube (coe0→1 A x) y
 
 is-prop∙→is-contr : is-prop A → A → is-contr A
@@ -100,7 +100,7 @@ is-prop→PathP {A = A} path a₀ a₁ = to-PathP $ path i1 (coe0→1 A a₀) a�
 is-contr→extend : is-contr A → (φ : 𝔽) (u : Partial φ A) → A [ φ ↦ u ]
 is-contr→extend (centre , connect) φ u = inS do
   hcomp (λ { i (φ = i0) → centre
-           ; i (φ = i1) → connect (u always) i })
+           ; i (φ = i1) → connect (u itIsOne) i })
         centre
 
 extend→is-contr : ((φ : 𝔽) (u : Partial φ A) → A [ φ ↦ u ]) → is-contr A
@@ -208,6 +208,21 @@ iso→is-set = iso→is-hlevel 2
   in iso→is-hlevel (suc n) Π-Path-iso
        (Π-is-hlevel (suc n) λ x → ncube x (f x) (g x))
 
+×-is-contr : is-contr A → is-contr B → is-contr (A × B)
+×-is-contr (a₀ , connectA) (b₀ , connectB) = record
+  { centre  = (a₀ , b₀)
+  ; connect = λ (a , b) → cong₂ _,_ (connectA a) (connectB b)
+  }
+
+×-is-prop : is-prop A → is-prop B → is-prop (A × B)
+×-is-prop pathA pathB = λ (a₀ , b₀) (a₁ , b₁) →
+  cong₂ _,_ (pathA a₀ a₁) (pathB b₀ b₁)
+
+×-is-set : is-set A → is-set B → is-set (A × B)
+×-is-set {A = A} {B} squareA squareB = λ (a₀ , b₀) (a₁ , b₁) p q i j →
+  (squareA a₀ a₁ (cong fst p) (cong fst q)) i j ,
+  (squareB b₀ b₁ (cong snd p) (cong snd q)) i j
+
 Σ-is-contr : is-contr A → (∀ x → is-contr (P x)) → is-contr (Σ A P)
 Σ-is-contr {P = P} (c , p) h = record
   { centre  = c , (h c) .centre
@@ -216,9 +231,9 @@ iso→is-set = iso→is-hlevel 2
   }
 
 Σ-is-prop : is-prop A → (∀ x → is-prop (P x)) → is-prop (Σ A P)
-Σ-is-prop path₁ path₂ = λ (a₀ , b₀) (a₁ , b₁) i →
-  ( path₁ a₀ a₁ i
-  , is-prop→PathP (λ i → path₂ (path₁ a₀ a₁ i)) b₀ b₁ i)
+Σ-is-prop pathA pathP = λ (a₀ , p₀) (a₁ , p₁) i →
+  ( pathA a₀ a₁ i
+  , is-prop→PathP (λ i → pathP (pathA a₀ a₁ i)) p₀ p₁ i)
 
 Σ-Path-intro : {x y : Σ A P} → Σ[ p ∈ fst x ≡ fst y ] (snd x ≡ snd y [ i ↦ P (p i)]) → x ≡ y
 Σ-Path-intro (p , q) = λ i → (p i , q i)
@@ -239,34 +254,33 @@ iso→is-set = iso→is-hlevel 2
 Σ-is-hlevel : ∀ n → is-hlevel A n → (∀ x → is-hlevel (P x) n) → is-hlevel (Σ A P) n
 Σ-is-hlevel 0 = Σ-is-contr
 Σ-is-hlevel 1 = Σ-is-prop
-Σ-is-hlevel (suc (suc n)) ncube₁ ncube₂ (x₀ , y₀) (x₁ , y₁) =
+Σ-is-hlevel (suc (suc n)) ncubeA ncubeP (a₀ , p₀) (a₁ , p₁) =
   iso→is-hlevel (suc n) Σ-Path-iso
     $ Σ-is-hlevel (suc n)
-        (ncube₁ x₀ x₁)
-        (λ _ → PathP-is-hlevel (suc n) (ncube₂ x₁) y₀ y₁)
-
-×-is-hlevel : ∀ n → is-hlevel A n → is-hlevel B n → is-hlevel (A × B) n
-×-is-hlevel n ncube₁ ncube₂ = Σ-is-hlevel n ncube₁ (const ncube₂)
+        (ncubeA a₀ a₁)
+        (λ _ → PathP-is-hlevel (suc n) (ncubeP a₁) p₀ p₁)
 
 Σ-is-set : is-set A → (∀ x → is-set (P x)) → is-set (Σ A P)
 Σ-is-set = Σ-is-hlevel 2
 
-×-is-set : is-set A → is-set B → is-set (A × B)
-×-is-set = ×-is-hlevel 2
+_-Type : Nat → Type
+n -Type = Σ[ A ∈ Type ] is-hlevel A n
 
-record _-Type (n : Nat) : Type where
-  no-eta-equality
-  constructor el
+Prop = 1 -Type
+Set  = 2 -Type
+
+record isHLevel (A : Type) (n : Nat) : Type where
+  constructor hlevel-instance
   field
-    type   : Type
-    hlevel : is-hlevel type n
+    hlevel : is-hlevel A n
 
-open _-Type using (hlevel) public
+isSet : (A : Type) → Type
+isSet A = isHLevel A 2
+
+hlevel : {A : Type} (n : Nat) ⦃ _ : isHLevel A n ⦄ → is-hlevel A n
+hlevel _ ⦃ hlevel-instance h ⦄ = h
 
 instance
-  n-Type-underlying : ∀ {n} → Underlying (n -Type)
-  n-Type-underlying = record
-    { ⌞_⌟ = _-Type.type
-    }
-
-Set = 2 -Type
+  Σ-HLevel : ∀ {n} ⦃ _ : isHLevel A n ⦄ ⦃ _ : ∀ {x} → isHLevel (P x) n ⦄
+    → isHLevel (Σ A P) n
+  Σ-HLevel {n = n} = hlevel-instance $ Σ-is-hlevel n (hlevel n) λ _ → hlevel n

@@ -70,7 +70,7 @@ private
   𝓒 ×′ 𝓓 = record
     { Ob  = Ob 𝓒 × Ob 𝓓
     ; Hom = λ (A₁ , A₂) (B₁ , B₂) → Hom 𝓒 A₁ B₁ × Hom 𝓓 A₂ B₂
-    ; Hom-set = ×-is-set (Hom-set 𝓒) (Hom-set 𝓓)
+    ; Hom-set = 🚧 -- ×-is-set (Hom-set 𝓒) (Hom-set 𝓓)
     ; op = record
       { id  = (id , id)
       ; _∘_ = λ (g₁ , g₂) (f₁ , f₂) → (g₁ ∘ f₁ , g₂ ∘ f₂)
@@ -112,6 +112,9 @@ instance
     ; π₂ = λ {𝓒 𝓓} → π₂′ {𝓒} {𝓓}
     ; <_,_> = <_,_>′
     }
+
+foo : ∀ {𝓒 𝓓 : Category} → 𝓒 × 𝓓 ⟶ 𝓒
+foo {𝓒} {𝓓} = π₁′ {𝓒 = {!!}} {𝓓 = {!!}}
 
 Δ : 𝓒 ⟶ 𝓒 × 𝓒
 Δ = record
