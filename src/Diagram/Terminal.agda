@@ -14,7 +14,7 @@ record Terminal : Type where
   <>′ {X} = terminal X .centre
 
   unique : ∀ {X} {⁇ : 𝓒 ⦅ X , apex ⦆} → ⁇ ≡ <>′
-  unique {X} {⁇} = sym (terminal X .connect ⁇)
+  unique {X} {⁇} = sym (terminal X .path-to ⁇)
 
   unique₂ : ∀ {X} {⁇₁ ⁇₂ : 𝓒 ⦅ X , apex ⦆} → ⁇₁ ≡ ⁇₂
   unique₂ {⁇₁ = ⁇₁} {⁇₂} = trans unique (sym unique)

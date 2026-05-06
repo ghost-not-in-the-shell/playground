@@ -8,16 +8,18 @@ record Underlying (A : Type) : Type where
 
 open Underlying ⦃...⦄ using (⌞_⌟) public
 
+{-# DISPLAY Underlying.⌞_⌟ _ = ⌞_⌟ #-}
+
 record Funlike (Fun : Type) (Arg : Type) (Out : Arg → Type) : Type where
   constructor funlike-instance
-  infix 6 _₍_₎ _▴
+  infix 6 _₍_₎ _₋
   field
     _₍_₎ : (f : Fun) (x : Arg) → Out x
 
-  _▴ : (f : Fun) {x : Arg} → Out x
-  f ▴ = f ₍ _ ₎
+  _₋ : (f : Fun) {x : Arg} → Out x
+  f ₋ = f ₍ _ ₎
 
 open Funlike ⦃...⦄ public
 
 {-# DISPLAY Funlike._₍_₎ _ = _₍_₎ #-}
-{-# DISPLAY Funlike._▴   _ = _▴   #-}
+{-# DISPLAY Funlike._₋   _ = _₋   #-}

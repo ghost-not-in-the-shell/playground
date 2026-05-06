@@ -139,6 +139,12 @@ module _ {Ob : Type} {Hom : Ob → Ob → Type} ⦃ _ : CompositionalOp Hom ⦄ 
 
 {-# DISPLAY is-iso.bwd {f = f} _ = f ⁻¹ #-}
 
+record Isomorphism {Ob : Type} (Hom : Ob → Ob → Type) ⦃ _ : CompositionalOp Hom ⦄ (A B : Ob) : Type where
+  constructor fwd
+  field
+    fwd : Hom A B
+    ⦃ iso ⦄ : is-iso Hom fwd
+
 Function : Type → Type → Type
 Function A B = A → B
 
@@ -158,8 +164,12 @@ instance
     }
 
 infix 4 _≅_
-record _≅_ (A B : Type) : Type where
-  constructor fwd
-  field
-    fwd : A → B
-    ⦃ iso ⦄ : is-iso Function fwd
+_≅_ : Type → Type → Type
+A ≅ B = Isomorphism Function A B
+
+module _ {A B} (f : Function A B) ⦃ iso : is-iso Function f ⦄ where
+  invˡ : ∀ {x} → (f ⁻¹ $ f x) ≡ x
+  invˡ {x} = λ i → ∘-invˡ f i x
+
+  invʳ : ∀ {x} → f (f ⁻¹ $ x) ≡ x
+  invʳ {x} = λ i → ∘-invʳ f i x

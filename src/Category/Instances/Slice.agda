@@ -1,4 +1,4 @@
-module Category.Slice where
+module Category.Instances.Slice where
 open import Prelude
 open import Category.Base
 

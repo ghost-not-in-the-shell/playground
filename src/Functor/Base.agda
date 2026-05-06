@@ -3,7 +3,7 @@ open import Prelude
 open import Category.Base
 
 record Functor (𝓒 𝓓 : Category) : Type where
-  infix 6 map₀ map₁
+  infixl 6 map₀ map₁
   field
     map₀ : Ob 𝓒 → Ob 𝓓
   private 𝐹₀ = map₀
@@ -23,6 +23,31 @@ _⟶_ = Functor
 
 private variable
   𝓒 𝓓 𝓔 𝓧 : Category
+
+instance
+  Functor-extensional : ⦃ _ : Extensional (Ob 𝓒 → Ob 𝓓) ⦄
+    → Extensional (Functor 𝓒 𝓓)
+  Functor-extensional {𝓒} {𝓓} = record
+    { _≈_ = _≈′_
+    ; ext = ext′
+    } where _≈′_ : (𝐹 𝐺 : 𝓒 ⟶ 𝓓) → Type
+            𝐹 ≈′ 𝐺 =
+              Σ[ map₀ ∈ 𝐹 ₀_ ≡ 𝐺 ₀_ [ i ↦ (Ob 𝓒 → Ob 𝓓) ] ]
+                        𝐹 ₁_ ≡ 𝐺 ₁_ [ i ↦ (∀ {A B} → 𝓒 ⦅ A , B ⦆ → 𝓓 ⦅ map₀ i A , map₀ i B ⦆) ]
+
+            ext′ : {𝐹 𝐺 : 𝓒 ⟶ 𝓓} → 𝐹 ≈′ 𝐺 → 𝐹 ≡ 𝐺
+            ext′ {𝐹} {𝐺} (map₀ , map₁) = λ i → record
+              { map₀ = λ A → map₀ i A
+              ; map₁ = λ f → map₁ i f
+              ; resp-id =
+                  is-prop→PathP
+                    (λ i → Hom-set 𝓓 (map₁ i id) id)
+                    (resp-id 𝐹) (resp-id 𝐺) i
+              ; resp-∘ = λ {A B C f g} →
+                  is-prop→PathP
+                    (λ i → Hom-set 𝓓 (map₁ i (g ∘ f)) (map₁ i g ∘ map₁ i f))
+                    (resp-∘ 𝐹) (resp-∘ 𝐺) i
+              }
 
 private module Duality where
   instance
@@ -70,15 +95,17 @@ private
   𝓒 ×′ 𝓓 = record
     { Ob  = Ob 𝓒 × Ob 𝓓
     ; Hom = λ (A₁ , A₂) (B₁ , B₂) → Hom 𝓒 A₁ B₁ × Hom 𝓓 A₂ B₂
-    ; Hom-set = 🚧 -- ×-is-set (Hom-set 𝓒) (Hom-set 𝓓)
+    ; Hom-set = ×-is-set (Hom-set 𝓒) (Hom-set 𝓓)
     ; op = record
       { id  = (id , id)
       ; _∘_ = λ (g₁ , g₂) (f₁ , f₂) → (g₁ ∘ f₁ , g₂ ∘ f₂)
       }
-    ; ∘-idˡ   = cong₂ _,_ (∘-idˡ 𝓒)   (∘-idˡ 𝓓)
-    ; ∘-idʳ   = cong₂ _,_ (∘-idʳ 𝓒)   (∘-idʳ 𝓓)
+    ; ∘-idˡ   = cong₂ _,_ (∘-idˡ   𝓒) (∘-idˡ   𝓓)
+    ; ∘-idʳ   = cong₂ _,_ (∘-idʳ   𝓒) (∘-idʳ   𝓓)
     ; ∘-assoc = cong₂ _,_ (∘-assoc 𝓒) (∘-assoc 𝓓)
     }
+
+  {-# INJECTIVE_FOR_INFERENCE _×′_ #-}
 
   π₁′ : 𝓒 ×′ 𝓓 ⟶ 𝓒
   π₁′ = record
@@ -112,9 +139,6 @@ instance
     ; π₂ = λ {𝓒 𝓓} → π₂′ {𝓒} {𝓓}
     ; <_,_> = <_,_>′
     }
-
-foo : ∀ {𝓒 𝓓 : Category} → 𝓒 × 𝓓 ⟶ 𝓒
-foo {𝓒} {𝓓} = π₁′ {𝓒 = {!!}} {𝓓 = {!!}}
 
 Δ : 𝓒 ⟶ 𝓒 × 𝓒
 Δ = record

@@ -1,7 +1,7 @@
-module Category.Slice.Iterated {𝓒} where
+module Category.Instances.Slice.Iterated {𝓒} where
 open import Prelude
 open import Category.Base
-open import Category.Slice
+open import Category.Instances.Slice
 open import Functor.Base
 
 to-iterated : {Γ : Ob 𝓒} (A@(Γ⨾A , π) : 𝓒 / Γ -Ob) → 𝓒 / Γ⨾A ⟶ (𝓒 / Γ) / A

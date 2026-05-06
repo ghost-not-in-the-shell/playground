@@ -1,7 +1,7 @@
-module Category.Slice.FiniteLimits 𝓒 {I} where
+module Category.Instances.Slice.FiniteLimits 𝓒 {I} where
 open import Prelude
 open import Category.Base
-open import Category.Slice
+open import Category.Instances.Slice
 open import Diagram.Product
 open import Diagram.Pullback
 open import Diagram.Terminal
@@ -26,7 +26,7 @@ open import Diagram.Terminal
                ⁇ ∎
     in record
     { centre = !ᵢ
-    ; connect = uniqueᵢ
+    ; path-to = uniqueᵢ
     }
   }
 

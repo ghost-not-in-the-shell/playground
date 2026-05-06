@@ -14,6 +14,12 @@ record Category : Type where
     ∘-assoc : ∀ {A B C D} {f : Hom A B} {g : Hom B C} {h : Hom C D}
       → (h ∘ g) ∘ f ≡ h ∘ (g ∘ f)
 
+  HomSet : ∀ A B → Set
+  HomSet A B = record
+    { fst = Hom A B
+    ; snd = Hom-set
+    }
+
   ∘-idˡʳ : ∀ {A B} {f : Hom A B} → id ∘ f ≡ f ∘ id
   ∘-idˡʳ = trans ∘-idˡ (sym ∘-idʳ)
 
@@ -22,6 +28,10 @@ open Category public
 infix 5 _⦅_,_⦆
 _⦅_,_⦆ = Category.Hom
 {-# DISPLAY Hom = _⦅_,_⦆ #-}
+
+infix 4 _⦅_≅_⦆
+_⦅_≅_⦆ : ∀ 𝓒 → Ob 𝓒 → Ob 𝓒 → Type
+𝓒 ⦅ A ≅ B ⦆ = Isomorphism (Hom 𝓒) A B
 
 private module Duality where
   instance
@@ -46,29 +56,42 @@ private module Duality where
 
 open Duality public
 
-infixr 5 _○_
-_○_ : {Ob : Type} {Hom : Ob → Ob → Type} ⦃ _ : CompositionalOp Hom ⦄
-  → {A B C : Ob} {f₀ f₁ : Hom A B} {g₀ g₁ : Hom B C}
-  → g₀ ≡ g₁ → f₀ ≡ f₁ → g₀ ∘ f₀ ≡ g₁ ∘ f₁
-g ○ f = cong₂ _∘_ g f
+private module CategoricalReasoning where
+  infixr 5 _○_
+  _○_ : {Ob : Type} {Hom : Ob → Ob → Type} ⦃ _ : CompositionalOp Hom ⦄
+    → {A B C : Ob} {f₀ f₁ : Hom A B} {g₀ g₁ : Hom B C}
+    → g₀ ≡ g₁ → f₀ ≡ f₁ → g₀ ∘ f₀ ≡ g₁ ∘ f₁
+  g ○ f = cong₂ _∘_ g f
 
-𝓢𝓮𝓽 : Category
-𝓢𝓮𝓽 = record
-  { Ob      = Set
-  ; Hom     = λ (A , squareA) (B , squareB) → Function A B
-  ; Hom-set = λ {(A , squareA)} {(B , squareB)} f g p q i j a →
-      squareB (f a) (g a) (cong (_$ a) p) (cong (_$ a) q) i j
-  ; op = record
-    { id  = id
-    ; _∘_ = _∘_
+open CategoricalReasoning public
+
+private module Sets where
+  Map : Set → Set → Type
+  Map (A , squareA) (B , squareB) = A → B
+
+  𝓢𝓮𝓽 : Category
+  𝓢𝓮𝓽 = record
+    { Ob      = Set
+    ; Hom     = Map
+    ; Hom-set = λ {(A , squareA)} {(B , squareB)} → →‿is-set squareB
+    ; op = record
+      { id  = id
+      ; _∘_ = _∘_
+      }
+    ; ∘-idˡ   = refl
+    ; ∘-idʳ   = refl
+    ; ∘-assoc = refl
     }
-  ; ∘-idˡ   = refl
-  ; ∘-idʳ   = refl
-  ; ∘-assoc = refl
-  }
 
-HomSet : ∀ 𝓒 A B → Set
-HomSet 𝓒 A B = record
-  { fst = Hom 𝓒 A B
-  ; snd = Hom-set 𝓒
-  }
+  is-iso-Map : ∀ A B (f : Map A B) → Type
+  is-iso-Map A B f = is-iso Map ⦃ op 𝓢𝓮𝓽 ⦄ {A} {B} f
+
+  instance
+    𝓢𝓮𝓽-iso : ∀ {A B} {f : Map A B} ⦃ _ : is-iso Function f ⦄ → is-iso-Map A B f
+    𝓢𝓮𝓽-iso {f = f} = record
+      { bwd = f ⁻¹
+      ; ∘-invˡ = ∘-invˡ f
+      ; ∘-invʳ = ∘-invʳ f
+      }
+
+open Sets public
