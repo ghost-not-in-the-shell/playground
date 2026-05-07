@@ -13,9 +13,9 @@ open ApplicativeReasoning
   { Ob = 𝓒 ⟶ 𝓓
   ; Hom = NaturalTransformation
   ; Hom-set = NaturalTransformation-is-set
-  ; ∘-idˡ   = ext λ A → 𝓓 .∘-idˡ
-  ; ∘-idʳ   = ext λ A → 𝓓 .∘-idʳ
-  ; ∘-assoc = ext λ A → 𝓓 .∘-assoc
+  ; ∘-idˡ   = ext λ {A} → 𝓓 .∘-idˡ
+  ; ∘-idʳ   = ext λ {A} → 𝓓 .∘-idʳ
+  ; ∘-assoc = ext λ {A} → 𝓓 .∘-assoc
   }
 
 [_,_] = 𝓕𝓾𝓷
@@ -45,8 +45,8 @@ private
   ƛ′ {𝓒 = 𝓒} 𝐹 = record
     { map₀ = λ A → 𝐹 ₀₍ A ,-₎
     ; map₁ = λ f → 𝐹 ₁₍ f ,-₎
-    ; resp-id = ext λ _ → resp-id 𝐹
-    ; resp-∘ = λ { {f = f} {g} → ext λ _ → begin
+    ; resp-id = ext λ {_} → resp-id 𝐹
+    ; resp-∘ = λ { {f = f} {g} → ext λ {_} → begin
         𝐹 ₁(g ∘ f , id)          ≡⟨ ⦇ (𝐹 ₁_) ⦇ - , ∘-idʳ 𝓒 ⦈ ⦈ ⟨
         𝐹 ₁(g ∘ f , id ∘ id)     ≡⟨ resp-∘ 𝐹 ⟩
         𝐹 ₁(g , id)∘ 𝐹 ₁(f , id) ∎ }

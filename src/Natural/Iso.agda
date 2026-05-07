@@ -33,6 +33,6 @@ module _ {𝓒 𝓓} {𝐹 𝐺 : 𝓒 ⟶ 𝓓} (α : 𝐹 ⟹ 𝐺) where
                id   ∘ 𝐹 ₁(f) ∘ α₋⁻¹  ≡⟨ ∘-idˡ 𝓓 ⟩
                       𝐹 ₁(f) ∘ α₋⁻¹  ∎
       }
-    ; ∘-invˡ = ext λ A → ∘-invˡ (α ₍ A ₎)
-    ; ∘-invʳ = ext λ A → ∘-invʳ (α ₍ A ₎)
+    ; ∘-invˡ = ext λ {A} → ∘-invˡ (α ₍ A ₎)
+    ; ∘-invʳ = ext λ {A} → ∘-invʳ (α ₍ A ₎)
     }

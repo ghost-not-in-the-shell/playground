@@ -12,15 +12,12 @@ record Extensional (A : Type) : Type where
 
 open Extensional ⦃...⦄ public
 
-≈[]-syntax : (A : Type) ⦃ _ : Extensional A ⦄ → A → A → Type
-≈[]-syntax A x y = _≈_ {A = A} x y
-
-infix 4 ≈[]-syntax
-syntax ≈[]-syntax A x y = x ≈ y [ A ]
+Pathᵉ : ∀ {A} → Extensional A → A → A → Type
+Pathᵉ Aᵉ = _≈_ ⦃ Aᵉ ⦄
 
 private variable
-  A B : Type
-  P : A → Type
+  A : Type
+  B : A → Type
 
 instance
   default-extensional : Extensional A
@@ -31,47 +28,39 @@ instance
 
   {-# INCOHERENT default-extensional #-}
 
-  →‿extensional : ⦃ Extensional B ⦄
-    → Extensional (A → B)
-  →‿extensional = record
+  Π-extensional : ⦃ Bᵉ : ∀ {x} → Extensional (B x) ⦄
+    → Extensional (∀ x → B x)
+  Π-extensional {A} {B} ⦃ Bᵉ ⦄ = record
     { _≈_ = _≈′_
     ; ext = ext′
-    } where _≈′_ : (f g : A → B) → Type
-            f ≈′ g = ∀ x → f x ≈ g x
+    } where _≈′_ : (f g : ∀ x → B x) → Type
+            f ≈′ g = ∀ x → Pathᵉ Bᵉ (f x) (g x)
 
-            ext′ : {f g : A → B} → f ≈′ g → f ≡ g
-            ext′ p i x = ext (p x) i
+            ext′ : {f g : ∀ x → B x} → f ≈′ g → f ≡ g
+            ext′ p = λ i x → ext ⦃ Bᵉ ⦄ (p x) i
 
-  Π-extensional : ⦃ ∀ {x} → Extensional (P x) ⦄
-    → Extensional (∀ x → P x)
-  Π-extensional = record
+  Πᵢ-extensional : ⦃ Bᵉ : ∀ {x} → Extensional (B x) ⦄
+    → Extensional (∀ {x} → B x)
+  Πᵢ-extensional {A} {B} ⦃ Bᵉ ⦄ = record
     { _≈_ = _≈′_
     ; ext = ext′
-    } where _≈′_ : (f g : ∀ x → P x) → Type
-            f ≈′ g = ∀ x → f x ≈ g x
+    } where _≈′_ : (f g : ∀ {x} → B x) → Type
+            f ≈′ g = ∀ {x} → Pathᵉ Bᵉ f g
 
-            ext′ : {f g : ∀ x → P x} → f ≈′ g → f ≡ g
-            ext′ p i x = ext (p x) i
+            ext′ : {f g : ∀ {x} → B x} → f ≈′ g → f ≡ g [ i ↦ (∀ {x} → B x) ]
+            ext′ = λ p i {x} → ext ⦃ Bᵉ ⦄ (p {x}) i
 
-  {-# OVERLAPPABLE Π-extensional #-}
 
-  Πᵢ-extensional : ⦃ ∀ {x} → Extensional (P x) ⦄
-    → Extensional (∀ {x} → P x)
-  Πᵢ-extensional {A} {P} ⦃ sb ⦄ = record
-    { _≈_ = _≈′_
-    ; ext = ext′
-    } where _≈′_ : (f g : ∀ {x} → P x) → Type
-            f ≈′ g = ∀ {x} → f ≈ g [ P x ]
-
-            ext′ : ∀ {f g : ∀ {x} → P x} → f ≈′ g → f ≡ g [ i ↦ (∀ {x} → P x) ]
-            ext′ = λ p i {x} → ext (p {x}) i
-
-injection→extensional : is-set B
+injection→extensional : ∀ {A B} → is-set B
   → {f : A → B}
   → (inj : ∀ {x y} → f x ≡ f y → x ≡ y)
-  → ⦃ _ : Extensional B ⦄
+  → ⦃ Bᵉ : Extensional B ⦄
   → Extensional A
-injection→extensional square {f} inj = record
-  { _≈_ = λ x y → f x ≈ f y
-  ; ext = λ p → inj (ext p)
-  }
+injection→extensional {A} {B} square {f} inj ⦃ Bᵉ ⦄ = record
+  { _≈_ = _≈′_
+  ; ext = ext′
+  } where _≈′_ : (x y : A) → Type
+          x ≈′ y = Pathᵉ (Bᵉ) (f x) (f y)
+
+          ext′ : {x y : A} → x ≈′ y → x ≡ y
+          ext′ p = inj (ext ⦃ Bᵉ ⦄ p)

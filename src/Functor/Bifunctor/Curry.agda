@@ -84,11 +84,11 @@ Curry 𝐹 = record
     ; resp-∘  = rmap-∘  𝐹
     }
   ; map₁ = λ f → record
-    { component = λ _ → 𝐹 ◂ f
+    { component = 𝐹 ◂ f
     ; natural   = lrmap 𝐹
     }
-  ; resp-id = ext λ _ → lmap-id 𝐹
-  ; resp-∘  = ext λ _ → lmap-∘  𝐹
+  ; resp-id = ext λ {_} → lmap-id 𝐹
+  ; resp-∘  = ext λ {_} → lmap-∘  𝐹
   }
 
 Uncurry : 𝓒 ⟶ [ 𝓓 , 𝓔 ] → 𝓒 ⊗ 𝓓 ⟶ 𝓔
@@ -210,7 +210,7 @@ binatural : {𝐹 𝐺 : 𝓒 ⊗ 𝓓 ⟶ 𝓔}
       → α{A}{T} ∘ 𝐹 ▸ p ≡ 𝐺 ▸ p ∘ α{A}{S})
   → Flat 𝐹 ⟹ Flat 𝐺
 binatural {𝓔 = 𝓔} {𝐹} {𝐺} α natural₁ natural₂ = record
-  { component = λ _ → α
+  { component = α
   ; natural = λ {(A , S)} {(B , T)} {(f , p)} → begin
       α ∘(𝐹 ▸ p ∘ 𝐹 ◂ f) ≡⟨ ∘-assoc 𝓔 ⟨
      (α ∘ 𝐹 ▸ p)∘ 𝐹 ◂ f  ≡⟨ natural₂ ○ - ⟩

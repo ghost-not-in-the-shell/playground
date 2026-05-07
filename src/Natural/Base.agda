@@ -6,10 +6,10 @@ open import Functor.Base
 record NaturalTransformation {𝓒 𝓓} (𝐹 𝐺 : 𝓒 ⟶ 𝓓) : Type where
   constructor _,_
   field
-    component : ∀ A → 𝓓 ⦅ 𝐹 ₀(A) , 𝐺 ₀(A) ⦆
+    component : ∀ {A} → 𝓓 ⦅ 𝐹 ₀(A) , 𝐺 ₀(A) ⦆
   private η = component
   field
-    natural : ∀ {A B} {f : 𝓒 ⦅ A , B ⦆} → η(B) ∘ 𝐹 ₁(f) ≡ 𝐺 ₁(f) ∘ η(A)
+    natural : ∀ {A B} {f : 𝓒 ⦅ A , B ⦆} → η ∘ 𝐹 ₁(f) ≡ 𝐺 ₁(f) ∘ η
 
 open NaturalTransformation public
 
@@ -20,7 +20,7 @@ _⟹_ = NaturalTransformation
 module _ {𝓒 𝓓} where
   instance
     natural-funlike : {𝐹 𝐺 : 𝓒 ⟶ 𝓓} → Funlike (𝐹 ⟹ 𝐺) (Ob 𝓒) λ A → 𝓓 ⦅ 𝐹 ₀(A) , 𝐺 ₀(A) ⦆
-    natural-funlike = funlike-instance λ η A → η .component A
+    natural-funlike = funlike-instance λ η A → η .component {A}
 
   {-# DISPLAY component α = α ₋ #-}
 
@@ -28,17 +28,17 @@ module _ {𝓒 𝓓} where
   NaturalTransformation-is-set {𝐹} {𝐺} = iso→is-set iso NaturalTransformation′-is-set
     where NaturalTransformation′ : Type
           NaturalTransformation′ =
-            Σ[ η ∈ (∀ A → 𝓓 ⦅ 𝐹 ₀(A) , 𝐺 ₀(A) ⦆) ]
-              ∀ {A B} {f : 𝓒 ⦅ A , B ⦆} → η(B) ∘ 𝐹 ₁(f) ≡ 𝐺 ₁(f) ∘ η(A)
+            Σ[ η ∈ (∀ {A} → 𝓓 ⦅ 𝐹 ₀(A) , 𝐺 ₀(A) ⦆) ]
+              ∀ {A B} {f : 𝓒 ⦅ A , B ⦆} → η ∘ 𝐹 ₁(f) ≡ 𝐺 ₁(f) ∘ η
 
           NaturalTransformation′-is-set : is-set NaturalTransformation′
           NaturalTransformation′-is-set =
-            Σ-is-set (Π-is-set (λ _ → Hom-set 𝓓))
+            Σ-is-set (Πᵢ-is-set (Hom-set 𝓓))
               λ η → is-prop→is-set $
                 Πᵢ-is-prop λ {A} →
                 Πᵢ-is-prop λ {B} →
                 Πᵢ-is-prop λ {f} →
-                  Hom-set 𝓓 (η(B) ∘ 𝐹 ₁(f)) (𝐺 ₁(f) ∘ η(A))
+                  Hom-set 𝓓 (η ∘ 𝐹 ₁(f)) (𝐺 ₁(f) ∘ η)
 
           iso : NaturalTransformation′ ≅ NaturalTransformation 𝐹 𝐺
           iso = record
@@ -53,13 +53,13 @@ module _ {𝓒 𝓓} where
   private
     id′ : {𝐹 : 𝓒 ⟶ 𝓓} → 𝐹 ⟹ 𝐹
     id′ = record
-      { component = λ _ → id
+      { component = id
       ; natural   = ∘-idˡʳ 𝓓
       }
 
     _∘′_ : {𝐹 𝐺 𝐻 : 𝓒 ⟶ 𝓓} → 𝐺 ⟹ 𝐻 → 𝐹 ⟹ 𝐺 → 𝐹 ⟹ 𝐻
     _∘′_ {𝐹} {𝐺} {𝐻} β α = record
-      { component = λ A → β ₍ A ₎ ∘ α ₍ A ₎
+      { component = λ {A} → β ₍ A ₎ ∘ α ₍ A ₎
       ; natural = λ { {f = f} → begin
          (β ₋   ∘ α ₋)   ∘ 𝐹 ₁(f)  ≡⟨ ∘-assoc 𝓓 ⟩
           β ₋   ∘(α ₋    ∘ 𝐹 ₁(f)) ≡⟨ - ○ natural α ⟩
@@ -77,22 +77,22 @@ module _ {𝓒 𝓓} where
       }
 
     Natural-extensional : {𝐹 𝐺 : 𝓒 ⟶ 𝓓}
-      → ⦃ _ : Extensional (∀ A → 𝓓 ⦅ 𝐹 ₀(A) , 𝐺 ₀(A) ⦆) ⦄
+      → ⦃ componentᵉ : Extensional (∀ {A} → 𝓓 ⦅ 𝐹 ₀(A) , 𝐺 ₀(A) ⦆) ⦄
       → Extensional (𝐹 ⟹ 𝐺)
-    Natural-extensional {𝐹} {𝐺} ⦃ Π-ext ⦄ = record
+    Natural-extensional {𝐹} {𝐺} ⦃ componentᵉ ⦄ = record
       { _≈_ = _≈′_
       ; ext = ext′
       } where
         _≈′_ : (α β : 𝐹 ⟹ 𝐺) → Type
-        α ≈′ β = component α ≈ component β
+        α ≈′ β = Pathᵉ componentᵉ (α ₋) (β ₋)
 
         ext′ : {α β : 𝐹 ⟹ 𝐺} → α ≈′ β → α ≡ β
         ext′ {α , α-natural} {β , β-natural} p = λ i → record
-          { component = ext p i
+          { component = ext ⦃ componentᵉ ⦄ p i
           ; natural = λ {A B f} →
               is-prop→PathP
-                (λ i → Hom-set 𝓓 (ext ⦃ Π-ext ⦄ p i B ∘ 𝐹 ₁(f))
-                                 (𝐺 ₁(f) ∘ ext ⦃ Π-ext ⦄ p i A))
+                (λ i → Hom-set 𝓓 (ext ⦃ componentᵉ ⦄ p i ∘ 𝐹 ₁(f))
+                                 (𝐺 ₁(f) ∘ ext ⦃ componentᵉ ⦄ p i))
                 α-natural β-natural i
           }
 
@@ -101,7 +101,7 @@ module 2-dimensional {𝓒 𝓓 𝓔} where
     → 𝐺′     ⟹ 𝐺″
     → 𝐺′ ∘ 𝐹 ⟹ 𝐺″ ∘ 𝐹
   whiskerˡ 𝐹 β = record
-    { component = λ A → β ₍ 𝐹 ₀(A) ₎
+    { component = λ {A} → β ₍ 𝐹 ₀(A) ₎
     ; natural   = natural   β
     }
 
@@ -109,7 +109,7 @@ module 2-dimensional {𝓒 𝓓 𝓔} where
     →     𝐹′ ⟹     𝐹″
     → 𝐺 ∘ 𝐹′ ⟹ 𝐺 ∘ 𝐹″
   whiskerʳ {𝐹′} {𝐹″} 𝐺 α = record
-    { component = λ A → 𝐺 ₁(α ₍ A ₎)
+    { component = λ {A} → 𝐺 ₁(α ₍ A ₎)
     ; natural = λ { {f = f} → begin
         𝐺 ₁(α ₋) ∘ 𝐺 ₁(𝐹′ ₁(f)) ≡⟨ resp-∘ 𝐺 ⟨
         𝐺 ₁(α ₋  ∘     𝐹′ ₁(f)) ≡⟨ cong (𝐺 ₁_) (natural α) ⟩
