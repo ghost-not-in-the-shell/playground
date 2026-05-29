@@ -50,6 +50,10 @@ module _ {𝓒 𝓓} where
               }
             }
 
+  instance
+    NaturalTransformationIsSet : {𝐹 𝐺 : 𝓒 ⟶ 𝓓} → IsSet (𝐹 ⟹ 𝐺)
+    NaturalTransformationIsSet = hlevel-instance NaturalTransformation-is-set
+
   private
     id′ : {𝐹 : 𝓒 ⟶ 𝓓} → 𝐹 ⟹ 𝐹
     id′ = record
@@ -129,3 +133,18 @@ module 2-dimensional {𝓒 𝓓 𝓔} where
   syntax horizontal α β = α ∗ β
 
 open 2-dimensional public
+
+private module Duality where
+  instance
+    opposite-natural-transformation : ∀ {𝓒 𝓓} {𝐹 𝐺 : 𝓒 ⟶ 𝓓} → Opposite (𝐹 ⟹ 𝐺) (𝐺 ᵒᵖ ⟹ 𝐹 ᵒᵖ)
+    opposite-natural-transformation = record
+      { opposite = λ α → record
+        { component = α .component
+        ; natural   = sym (α .natural)
+        }
+      }
+
+  _ : ∀ {𝓒 𝓓} {𝐹 𝐺 : 𝓒 ⟶ 𝓓} {α : 𝐹 ⟹ 𝐺} → (α ᵒᵖ)ᵒᵖ ≡ α
+  _ = refl
+
+open Duality public

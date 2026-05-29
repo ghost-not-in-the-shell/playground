@@ -17,7 +17,7 @@ module _ {𝓒 𝓓} {𝐹 𝐺 : 𝓒 ⟶ 𝓓} (α : 𝐹 ⟹ 𝐺) where
   from-component : ⦃ _ : {A : Ob 𝓒} → is-iso (Hom 𝓓) (α ₍ A ₎) ⦄ → is-iso (Hom [ 𝓒 , 𝓓 ]) α
   from-component = record
     { bwd = record
-      { component = λ A → (α ₍ A ₎)⁻¹
+      { component = λ {A} → (α ₍ A ₎)⁻¹
       ; natural = λ {A} {B} {f} →
         let α₋ : ∀ {A} → 𝓓 ⦅ 𝐹 ₀(A) , 𝐺 ₀(A) ⦆
             α₋ = α ₋

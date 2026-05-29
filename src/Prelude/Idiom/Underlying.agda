@@ -12,7 +12,7 @@ open Underlying ⦃...⦄ using (⌞_⌟) public
 
 record Funlike (Fun : Type) (Arg : Type) (Out : Arg → Type) : Type where
   constructor funlike-instance
-  infix 6 _₍_₎ _₋
+  infix 8 _₍_₎ _₋
   field
     _₍_₎ : (f : Fun) (x : Arg) → Out x
 

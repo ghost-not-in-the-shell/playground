@@ -36,10 +36,10 @@ record Bifunctor 𝓒 𝓓 𝓔 : Type where
 
 open Bifunctor public
 
-infix 4 _⊗_⟶_
-_⊗_⟶_ = Bifunctor
+infix 4 _×̅_⟶_
+_×̅_⟶_ = Bifunctor
 
-{-# DISPLAY Bifunctor = _⊗_⟶_ #-}
+{-# DISPLAY Bifunctor = _×̅_⟶_ #-}
 {-# DISPLAY map₀ = _₀₍_,_₎ #-}
 {-# DISPLAY lmap = _◂_     #-}
 {-# DISPLAY rmap = _▸_     #-}
@@ -47,7 +47,7 @@ _⊗_⟶_ = Bifunctor
 private variable
   𝓒 𝓓 𝓔 𝓧 : Category
 
-Left : 𝓒 ⊗ 𝓓 ⟶ 𝓔 → Ob 𝓓 → 𝓒 ⟶ 𝓔
+Left : 𝓒 ×̅ 𝓓 ⟶ 𝓔 → Ob 𝓓 → 𝓒 ⟶ 𝓔
 Left 𝐹 S = record
   { map₀ = λ A → 𝐹 ₀₍ A , S ₎
   ; map₁ = λ f → 𝐹 ◂ f
@@ -55,7 +55,7 @@ Left 𝐹 S = record
   ; resp-∘  = lmap-∘  𝐹
   }
 
-Right : 𝓒 ⊗ 𝓓 ⟶ 𝓔 → Ob 𝓒 → 𝓓 ⟶ 𝓔
+Right : 𝓒 ×̅ 𝓓 ⟶ 𝓔 → Ob 𝓒 → 𝓓 ⟶ 𝓔
 Right 𝐹 A = record
   { map₀ = λ S → 𝐹 ₀₍ A , S ₎
   ; map₁ = λ p → 𝐹 ▸ p
@@ -63,7 +63,7 @@ Right 𝐹 A = record
   ; resp-∘  = rmap-∘  𝐹
   }
 
-Flip : 𝓒 ⊗ 𝓓 ⟶ 𝓔 → 𝓓 ⊗ 𝓒 ⟶ 𝓔
+Flip : 𝓒 ×̅ 𝓓 ⟶ 𝓔 → 𝓓 ×̅ 𝓒 ⟶ 𝓔
 Flip 𝐹 = record
   { map₀ = flip (map₀ 𝐹)
   ; lmap = rmap 𝐹
@@ -75,7 +75,7 @@ Flip 𝐹 = record
   ; lrmap = sym (lrmap 𝐹)
   }
 
-Curry : 𝓒 ⊗ 𝓓 ⟶ 𝓔 → 𝓒 ⟶ [ 𝓓 , 𝓔 ]
+Curry : 𝓒 ×̅ 𝓓 ⟶ 𝓔 → 𝓒 ⟶ [ 𝓓 , 𝓔 ]
 Curry 𝐹 = record
   { map₀ = λ A → record
     { map₀ = λ S → 𝐹 ₀₍ A , S ₎ 
@@ -91,7 +91,7 @@ Curry 𝐹 = record
   ; resp-∘  = ext λ {_} → lmap-∘  𝐹
   }
 
-Uncurry : 𝓒 ⟶ [ 𝓓 , 𝓔 ] → 𝓒 ⊗ 𝓓 ⟶ 𝓔
+Uncurry : 𝓒 ⟶ [ 𝓓 , 𝓔 ] → 𝓒 ×̅ 𝓓 ⟶ 𝓔
 Uncurry 𝐹 = record
   { map₀ = λ A S → 𝐹 ₀(A) ₀(S)
   ; lmap = λ {S} f → 𝐹 ₁(f) ₍ S ₎
@@ -103,7 +103,7 @@ Uncurry 𝐹 = record
   ; lrmap   = natural (𝐹 ₁(_))
   }
 
-Flat : 𝓒 ⊗ 𝓓 ⟶ 𝓔 → 𝓒 × 𝓓 ⟶ 𝓔
+Flat : 𝓒 ×̅ 𝓓 ⟶ 𝓔 → 𝓒 × 𝓓 ⟶ 𝓔
 Flat {𝓔 = 𝓔} 𝐹 = record
   { map₀ = λ (A , S) → 𝐹 ₀₍ A , S ₎
   ; map₁ = λ (f , p) → 𝐹 ▸ p ∘ 𝐹 ◂ f
@@ -120,57 +120,48 @@ Flat {𝓔 = 𝓔} 𝐹 = record
   }
 
 private
-  _ : {𝐹 : 𝓒 ⊗ 𝓓 ⟶ 𝓔} → Uncurry (Curry 𝐹) ≡ 𝐹
+  _ : {𝐹 : 𝓒 ×̅ 𝓓 ⟶ 𝓔} → Uncurry (Curry 𝐹) ≡ 𝐹
   _ = refl
 
   _ : {𝐹 : 𝓒 ⟶ [ 𝓓 , 𝓔 ]} → Curry (Uncurry 𝐹) ≡ 𝐹
   _ = ext (refl , refl)
 
-  _ : {𝐹 : 𝓒 ⊗ 𝓓 ⟶ 𝓔} → Flip (Flip 𝐹) ≡ 𝐹
+  _ : {𝐹 : 𝓒 ×̅ 𝓓 ⟶ 𝓔} → Flip (Flip 𝐹) ≡ 𝐹
   _ = refl
 
-  _ : {𝐹 : 𝓒 ⊗ 𝓓 ⟶ 𝓔} → Right (Flip 𝐹) ≡ Left 𝐹
+  _ : {𝐹 : 𝓒 ×̅ 𝓓 ⟶ 𝓔} → Right (Flip 𝐹) ≡ Left 𝐹
   _ = refl
 
-  _ : {𝐹 : 𝓒 ⊗ 𝓓 ⟶ 𝓔} → Left (Flip 𝐹) ≡ Right 𝐹
+  _ : {𝐹 : 𝓒 ×̅ 𝓓 ⟶ 𝓔} → Left (Flip 𝐹) ≡ Right 𝐹
   _ = refl
+
+  _ : (𝐹 : 𝓒 ×̅ 𝓓 ⟶ 𝓔) → Flat (Flip 𝐹) ≡ Flat 𝐹 ∘ swap
+  _ = λ 𝐹 → ext (refl , ext λ _ → lrmap 𝐹)
 
 infix 5 _∘ˡ_ _∘ʳ_
 
-_∘ˡ_ : (𝐺 : 𝓒 ⊗ 𝓓 ⟶ 𝓔)
+_∘ˡ_ : (𝐺 : 𝓒 ×̅ 𝓓 ⟶ 𝓔)
      → (𝐹 : 𝓧 ⟶ 𝓒)
-     →      𝓧 ⊗ 𝓓 ⟶ 𝓔
+     →      𝓧 ×̅ 𝓓 ⟶ 𝓔
 𝐺 ∘ˡ 𝐹 = record
   { map₀ = λ A S → 𝐺 ₀₍ 𝐹 ₀(A) , S ₎
-  ; lmap = λ f → 𝐺 ◂(𝐹 ₁(f))
-  ; lmap-id = begin
-      𝐺 ◂(𝐹 ₁(id)) ≡⟨ ⦇ (𝐺 ◂_) (resp-id 𝐹) ⦈ ⟩
-      𝐺 ◂     id   ≡⟨ lmap-id 𝐺 ⟩
-              id   ∎
-  ; lmap-∘ = λ {S A B C f g} → begin
-      𝐺 ◂(𝐹 ₁(g ∘         f)) ≡⟨ ⦇ (𝐺 ◂_) (resp-∘ 𝐹) ⦈ ⟩
-      𝐺 ◂(𝐹 ₁ g ∘     𝐹 ₁ f)  ≡⟨ lmap-∘ 𝐺 ⟩
-      𝐺 ◂(𝐹 ₁ g)∘ 𝐺 ◂(𝐹 ₁ f)  ∎              
+  ; lmap = 𝐺 ◂_ ∘ 𝐹 ₁_
+  ; lmap-id = trans (cong (𝐺 ◂_) (resp-id 𝐹)) (lmap-id 𝐺)
+  ; lmap-∘  = trans (cong (𝐺 ◂_) (resp-∘  𝐹)) (lmap-∘  𝐺)
   ; rmap    = 𝐺 .rmap
   ; rmap-id = 𝐺 .rmap-id
   ; rmap-∘  = 𝐺 .rmap-∘
   ; lrmap   = 𝐺 .lrmap
   }
 
-_∘ʳ_ : (𝐺 : 𝓒 ⊗ 𝓓 ⟶ 𝓔)
+_∘ʳ_ : (𝐺 : 𝓒 ×̅ 𝓓 ⟶ 𝓔)
      → (𝐹 : 𝓧 ⟶ 𝓓)
-     →      𝓒 ⊗ 𝓧 ⟶ 𝓔
+     →      𝓒 ×̅ 𝓧 ⟶ 𝓔
 𝐺 ∘ʳ 𝐹 = record
   { map₀ = λ A S → 𝐺 ₀₍ A , 𝐹 ₀(S) ₎
-  ; rmap = λ p → 𝐺 ▸(𝐹 ₁(p))
-  ; rmap-id = begin
-      𝐺 ▸(𝐹 ₁ id) ≡⟨ ⦇ (𝐺 ▸_) (resp-id 𝐹) ⦈ ⟩
-      𝐺 ▸     id  ≡⟨ rmap-id 𝐺 ⟩
-              id  ∎
-  ; rmap-∘ = λ {A S T U p q} → begin
-      𝐺 ▸(𝐹 ₁(q ∘         p)) ≡⟨ ⦇ (𝐺 ▸_) (resp-∘ 𝐹) ⦈ ⟩
-      𝐺 ▸(𝐹 ₁ q ∘     𝐹 ₁ p)  ≡⟨ rmap-∘ 𝐺 ⟩
-      𝐺 ▸(𝐹 ₁ q)∘ 𝐺 ▸(𝐹 ₁ p)  ∎ 
+  ; rmap = 𝐺 ▸_ ∘ 𝐹 ₁_
+  ; rmap-id = trans (cong (𝐺 ▸_) (resp-id 𝐹)) (rmap-id 𝐺)
+  ; rmap-∘  = trans (cong (𝐺 ▸_) (resp-∘  𝐹)) (rmap-∘  𝐺)
   ; lmap    = 𝐺 .lmap
   ; lmap-id = 𝐺 .lmap-id
   ; lmap-∘  = 𝐺 .lmap-∘
@@ -178,15 +169,31 @@ _∘ʳ_ : (𝐺 : 𝓒 ⊗ 𝓓 ⟶ 𝓔)
   }
 
 private
-  _ : {𝐺 : 𝓒 ⊗ 𝓓 ⟶ 𝓔} {𝐹 : 𝓧 ⟶ 𝓒}
+  _ : {𝐺 : 𝓒 ×̅ 𝓓 ⟶ 𝓔} {𝐹 : 𝓧 ⟶ 𝓒}
     → Flat 𝐺 ∘ 𝐹 ×₁ id ≡ Flat (𝐺 ∘ˡ 𝐹)
   _ = ext (refl , refl)
 
-  _ : {𝐺 : 𝓒 ⊗ 𝓓 ⟶ 𝓔} {𝐹 : 𝓧 ⟶ 𝓓}
+  _ : {𝐺 : 𝓒 ×̅ 𝓓 ⟶ 𝓔} {𝐹 : 𝓧 ⟶ 𝓓}
     → Flat 𝐺 ∘ id ×₁ 𝐹 ≡ Flat (𝐺 ∘ʳ 𝐹)
   _ = ext (refl , refl)
 
-Eval : [ 𝓒 , 𝓓 ] ⊗ 𝓒 ⟶ 𝓓
+  _ : {𝐺 : 𝓒 ×̅ 𝓓 ⟶ 𝓔} {𝐹 : 𝓧 ⟶ 𝓒} {S : Ob 𝓓}
+    → Left (𝐺 ∘ˡ 𝐹) S ≡ Left 𝐺 S ∘ 𝐹
+  _ = refl
+
+  _ : {𝐺 : 𝓒 ×̅ 𝓓 ⟶ 𝓔} {𝐹 : 𝓧 ⟶ 𝓒} {A : Ob 𝓧}
+    → Right (𝐺 ∘ˡ 𝐹) A ≡ Right 𝐺 (𝐹 ₀(A))
+  _ = refl
+
+  _ : {𝐺 : 𝓒 ×̅ 𝓓 ⟶ 𝓔} {𝐹 : 𝓧 ⟶ 𝓓} {A : Ob 𝓒}
+    → Right (𝐺 ∘ʳ 𝐹) A ≡ Right 𝐺 A ∘ 𝐹
+  _ = refl
+
+  _ : {𝐺 : 𝓒 ×̅ 𝓓 ⟶ 𝓔} {𝐹 : 𝓧 ⟶ 𝓓} {S : Ob 𝓧}
+    → Left (𝐺 ∘ʳ 𝐹) S ≡ Left 𝐺 (𝐹 ₀(S))
+  _ = refl
+
+Eval : [ 𝓒 , 𝓓 ] ×̅ 𝓒 ⟶ 𝓓
 Eval {𝓒} {𝓓} = record
   { map₀ = λ  𝐹  A → 𝐹 ₀(A)
   ; rmap = λ {𝐹} f → 𝐹 ₁(f)
@@ -198,11 +205,25 @@ Eval {𝓒} {𝓓} = record
   ; lrmap = λ { {f = α} → natural α }
   }
 
+-$_ : (A : Ob 𝓒) → [ 𝓒 , 𝓓 ] ⟶ 𝓓
+-$ A = record
+  { map₀ = λ 𝐹 → 𝐹 ₀(A)
+  ; map₁ = λ α → α ₍ A ₎
+  ; resp-id = refl
+  ; resp-∘  = refl
+  }
+
 private
-  _ : Flat Eval ≡ ev [ i ↦ ([ 𝓒 , 𝓓 ] × 𝓒 ⟶ 𝓓) ]
+  _ : Flat Eval ≡ ev [ i ↦ [ 𝓒 , 𝓓 ] × 𝓒 ⟶ 𝓓 ]
   _ = refl
 
-binatural : {𝐹 𝐺 : 𝓒 ⊗ 𝓓 ⟶ 𝓔}
+  _ : {A : Ob 𝓒} → Left Eval A ≡ -$ A [ i ↦ [ 𝓒 , 𝓓 ] ⟶ 𝓓 ]
+  _ = refl
+
+  _ : {𝐹 : 𝓒 ⟶ 𝓓} → Right Eval 𝐹 ≡ 𝐹
+  _ = refl
+
+binatural : {𝐹 𝐺 : 𝓒 ×̅ 𝓓 ⟶ 𝓔}
   → (α : ∀ {A S} → 𝓔 ⦅ 𝐹 ₀₍ A , S ₎ , 𝐺 ₀₍ A , S ₎ ⦆)
   → (natural₁ : ∀ {S A B} {f : 𝓒 ⦅ A , B ⦆}
       → α{B}{S} ∘ 𝐹 ◂ f ≡ 𝐺 ◂ f ∘ α{A}{S})

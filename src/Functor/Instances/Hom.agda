@@ -10,7 +10,7 @@ infix 6 _⦅-,_⦆ _⦅_,-⦆ _⦅-,-⦆
 
 _⦅-,_⦆ : ∀ 𝓒 → Ob 𝓒 → 𝓒 ᵒᵖ ⟶ 𝓢𝓮𝓽
 𝓒 ⦅-, X ⦆ = record
-  { map₀ = λ A → HomSet 𝓒 A X
+  { map₀ = λ A → 𝓒 ⦅ A , X ⦆ , Hom-set 𝓒
   ; map₁ = λ f → _∘ f
   ; resp-id = ext λ _ → ∘-idʳ 𝓒
   ; resp-∘  = ext λ _ → sym (∘-assoc 𝓒)
@@ -18,7 +18,7 @@ _⦅-,_⦆ : ∀ 𝓒 → Ob 𝓒 → 𝓒 ᵒᵖ ⟶ 𝓢𝓮𝓽
 
 _⦅_,-⦆ : ∀ 𝓒 → Ob (𝓒 ᵒᵖ) → 𝓒 ⟶ 𝓢𝓮𝓽
 𝓒 ⦅ X ,-⦆ = record
-  { map₀ = λ A → HomSet 𝓒 X A
+  { map₀ = λ A → 𝓒 ⦅ X , A ⦆ , Hom-set 𝓒
   ; map₁ = λ g → g ∘_
   ; resp-id = ext λ _ → ∘-idˡ 𝓒
   ; resp-∘  = ext λ _ → ∘-assoc 𝓒
@@ -28,30 +28,24 @@ private
   _ : ∀ {𝓒} {X : Ob (𝓒 ᵒᵖ)} → 𝓒 ⦅ X ,-⦆ ≡ 𝓒 ᵒᵖ ⦅-, X ⦆
   _ = refl
 
-_* : ∀ {𝓒} {A B : Ob 𝓒} → 𝓒 ᵒᵖ ⦅ A , B ⦆ → 𝓒 ⦅ A ,-⦆ ⟹ 𝓒 ⦅ B ,-⦆
-_* {𝓒} f = record
-  { component = _∘ f
-  ; natural = ext λ _ → ∘-assoc 𝓒
-  }
-
 ℎ⁻ : ∀ {𝓒} → 𝓒 ᵒᵖ ⟶ [ 𝓒 , 𝓢𝓮𝓽 ]
 ℎ⁻ {𝓒} = record
   { map₀ = 𝓒 ⦅_,-⦆
-  ; map₁ = _*
+  ; map₁ = λ f → record
+    { component = _∘ f
+    ; natural = ext λ _ → ∘-assoc 𝓒
+    }
   ; resp-id = ext λ _ → ∘-idʳ 𝓒
   ; resp-∘  = ext λ _ → sym (∘-assoc 𝓒)
-  }
-
-_⁎ : ∀ {𝓒 A B} → 𝓒 ⦅ A , B ⦆ → 𝓒 ⦅-, A ⦆ ⟹ 𝓒 ⦅-, B ⦆
-_⁎ {𝓒} g = record
-  { component = g ∘_
-  ; natural = ext λ _ → sym (∘-assoc 𝓒)
   }
 
 ℎ₋ : ∀ {𝓒} → 𝓒 ⟶ [ 𝓒 ᵒᵖ , 𝓢𝓮𝓽 ]
 ℎ₋ {𝓒} = record
   { map₀ = 𝓒 ⦅-,_⦆
-  ; map₁ = _⁎
+  ; map₁ = λ g → record
+    { component = g ∘_
+    ; natural = ext λ _ → sym (∘-assoc 𝓒)
+    }
   ; resp-id = ext λ _ → ∘-idˡ 𝓒
   ; resp-∘  = ext λ _ → ∘-assoc 𝓒
   }
@@ -60,9 +54,9 @@ private
   _ : ∀ {𝓒} → ℎ⁻ {𝓒} ≡ ℎ₋ {𝓒 ᵒᵖ}
   _ = refl
 
-_⦅-,-⦆ : ∀ 𝓒 → 𝓒 ᵒᵖ ⊗ 𝓒 ⟶ 𝓢𝓮𝓽
+_⦅-,-⦆ : ∀ 𝓒 → 𝓒 ᵒᵖ ×̅ 𝓒 ⟶ 𝓢𝓮𝓽
 𝓒 ⦅-,-⦆ = record
-  { map₀ = HomSet 𝓒
+  { map₀ = λ A B → 𝓒 ⦅ A , B ⦆ , Hom-set 𝓒
   ; lmap = λ f → _∘ f
   ; rmap = λ g → g ∘_
   ; lmap-id = ext λ _ → ∘-idʳ 𝓒
@@ -73,7 +67,7 @@ _⦅-,-⦆ : ∀ 𝓒 → 𝓒 ᵒᵖ ⊗ 𝓒 ⟶ 𝓢𝓮𝓽
   }
 
 private
-  _ : ∀ {𝓒 S} → Left (𝓒 ⦅-,-⦆) S ≡ 𝓒 ⦅-, S ⦆
+  _ : ∀ {𝓒 B} → Left (𝓒 ⦅-,-⦆) B ≡ 𝓒 ⦅-, B ⦆
   _ = refl
 
   _ : ∀ {𝓒 A} → Right (𝓒 ⦅-,-⦆) A ≡ 𝓒 ⦅ A ,-⦆

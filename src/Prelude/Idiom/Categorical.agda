@@ -47,46 +47,47 @@ module _ {Ob : Type} where
     app : ∀ ⦃ _ : CompositionalOp Hom ⦄ {Γ A B} (f : Hom Γ (A ⇒ B)) (x : Hom Γ A) → Hom Γ B
     app f x = ev ∘ < f , x >
 
-    uncurry : ∀ ⦃ _ : CompositionalOp Hom ⦄ {Γ A B} (f : Hom Γ (A ⇒ B)) → Hom (Γ × A) B
-    uncurry f = ev ∘ f ×₁ id
+    unƛ : ∀ ⦃ _ : CompositionalOp Hom ⦄ {Γ A B} (f : Hom Γ (A ⇒ B)) → Hom (Γ × A) B
+    unƛ f = ev ∘ f ×₁ id
 
-    _⇒₁_ : ∀ ⦃ _ : CompositionalOp Hom ⦄ {A B C D}
-      → Hom A B → Hom C D → Hom (B ⇒ C) (A ⇒ D)
+    _⇒₁_ : ∀ ⦃ _ : CompositionalOp Hom ⦄ {A B S T}
+      → (f : Hom B A)
+      → (p : Hom S T)
+      → Hom (A ⇒ S) (B ⇒ T)
     f ⇒₁ g = ƛ(g ∘ ev ∘ id ×₁ f)
 
   open ExponentialOp ⦃...⦄ public
 
   record PullbackOp (Hom : Ob → Ob → Type) ⦃ _ : CompositionalOp Hom ⦄ : Type where
-    infixr 7 ⊗₍₎
+    infixr 7 _⊗_
     field
-      ⊗₍₎ : ∀ {I} A B (a : Hom A I) (b : Hom B I) → Ob
-    syntax ⊗₍₎ A B a b = A ⊗₍ a , b ₎ B
+      _⊗_ : ∀ {I A B} (a : Hom A I) (b : Hom B I) → Ob
     field
-      p : ∀ {I A B} {a : Hom A I} {b : Hom B I} → Hom (A ⊗₍ a , b ₎ B) A
-      q : ∀ {I A B} {a : Hom A I} {b : Hom B I} → Hom (A ⊗₍ a , b ₎ B) B
+      p : ∀ {I A B} {a : Hom A I} {b : Hom B I} → Hom (a ⊗ b) A
+      q : ∀ {I A B} {a : Hom A I} {b : Hom B I} → Hom (a ⊗ b) B
       <[-]> : ∀ {I A B X} {a : Hom A I} {b : Hom B I}
         → (f : Hom X A) (g : Hom X B)
         → (□ : a ∘ f ≡ b ∘ g)
-        → Hom X (A ⊗₍ a , b ₎ B)
+        → Hom X (a ⊗ b)
 
     syntax <[-]> f g □ = < f [ □ ] g >
     
-    p₍_,_₎ : ∀ {I A B} (a : Hom A I) (b : Hom B I) → Hom (A ⊗₍ a , b ₎ B) A
-    q₍_,_₎ : ∀ {I A B} (a : Hom A I) (b : Hom B I) → Hom (A ⊗₍ a , b ₎ B) B
+    p₍_,_₎ : ∀ {I A B} (a : Hom A I) (b : Hom B I) → Hom (a ⊗ b) A
+    q₍_,_₎ : ∀ {I A B} (a : Hom A I) (b : Hom B I) → Hom (a ⊗ b) B
     p₍ _ , _ ₎ = p
     q₍ _ , _ ₎ = q
 
-    <_[]_> : ∀ {I A B X} {a : Hom A I} {b : Hom B I}
+    <_□_> : ∀ {I A B X} {a : Hom A I} {b : Hom B I}
       → (f : Hom X A) (g : Hom X B)
       → {□ : a ∘ f ≡ b ∘ g}
-      → Hom X (A ⊗₍ a , b ₎ B)
-    <_[]_> f g {□} = < f [ □ ] g >
+      → Hom X (a ⊗ b)
+    <_□_> f g {□} = < f [ □ ] g >
 
   open PullbackOp ⦃...⦄ public
 
-{-# DISPLAY CompositionalOp.id    _ = id    #-}
-{-# DISPLAY CompositionalOp._∘_   _ = _∘_   #-}
-{-# DISPLAY CompositionalOp.id₍_₎ _ = id₍_₎ #-}  
+{-# DISPLAY CompositionalOp.id    _   = id  #-}
+{-# DISPLAY CompositionalOp._∘_   _   = _∘_ #-}
+{-# DISPLAY CompositionalOp.id₍_₎ _ _ = id  #-}
 
 {-# DISPLAY TerminalOp.𝟙  _ = 𝟙  #-}
 {-# DISPLAY TerminalOp.<> _ = <> #-}
@@ -98,23 +99,23 @@ module _ {Ob : Type} where
 {-# DISPLAY ProductOp.swap  _ = swap  #-}
 {-# DISPLAY ProductOp._×₁_  _ = _×₁_  #-}
 
-{-# DISPLAY ExponentialOp._⇒_     _ = _⇒_     #-}
-{-# DISPLAY ExponentialOp.ev      _ = ev      #-}
-{-# DISPLAY ExponentialOp.ƛ       _ = ƛ       #-}
-{-# DISPLAY ExponentialOp.app     _ = app     #-}
-{-# DISPLAY ExponentialOp.uncurry _ = uncurry #-}
-{-# DISPLAY ExponentialOp._⇒₁_    _ = _⇒₁_    #-}
+{-# DISPLAY ExponentialOp._⇒_  _ = _⇒_  #-}
+{-# DISPLAY ExponentialOp.ev   _ = ev   #-}
+{-# DISPLAY ExponentialOp.ƛ    _ = ƛ    #-}
+{-# DISPLAY ExponentialOp.app  _ = app  #-}
+{-# DISPLAY ExponentialOp.unƛ  _ = unƛ  #-}
+{-# DISPLAY ExponentialOp._⇒₁_ _ = _⇒₁_ #-}
 
-{-# DISPLAY PullbackOp.⊗₍₎     _       = ⊗₍₎            #-}
-{-# DISPLAY PullbackOp.p       _       = p              #-}
-{-# DISPLAY PullbackOp.q       _       = q              #-}
-{-# DISPLAY PullbackOp.<[-]>   _ f g □ = <_[]_> f g {□} #-}
-{-# DISPLAY PullbackOp.p₍_,_₎  _       = p₍_,_₎         #-}
-{-# DISPLAY PullbackOp.q₍_,_₎  _       = q₍_,_₎         #-}
-{-# DISPLAY PullbackOp.<_[]_>  _       = <_[]_>         #-}
+{-# DISPLAY PullbackOp._⊗_     _       = _⊗_       #-}
+{-# DISPLAY PullbackOp.p       _       = p         #-}
+{-# DISPLAY PullbackOp.q       _       = q         #-}
+{-# DISPLAY PullbackOp.<[-]>   _ f g _ = < f □ g > #-}
+{-# DISPLAY PullbackOp.p₍_,_₎  _       = p₍_,_₎    #-}
+{-# DISPLAY PullbackOp.q₍_,_₎  _       = q₍_,_₎    #-}
+{-# DISPLAY PullbackOp.<_□_>   _       = <_□_>     #-}
 
 record Opposite (A : Type) (Aᵒᵖ : Type) : Type where
-  infix 8 opposite
+  infix 9 opposite
   field
     opposite : A → Aᵒᵖ
 
@@ -132,12 +133,26 @@ record is-iso {Ob : Type} (Hom : Ob → Ob → Type) ⦃ _ : CompositionalOp Hom
     ∘-invʳ : f ∘ f⁻¹ ≡ id
 
 module _ {Ob : Type} {Hom : Ob → Ob → Type} ⦃ _ : CompositionalOp Hom ⦄ {A B : Ob} (f : Hom A B) ⦃ iso : is-iso Hom f ⦄ where
-  infix 8 _⁻¹
+  infix 9 _⁻¹
   _⁻¹ = is-iso.bwd iso
   ∘-invˡ = is-iso.∘-invˡ iso
   ∘-invʳ = is-iso.∘-invʳ iso
 
 {-# DISPLAY is-iso.bwd {f = f} _ = f ⁻¹ #-}
+
+instance
+  ⁻¹-iso : {Ob : Type} {Hom : Ob → Ob → Type}
+    → ⦃ _ : CompositionalOp Hom ⦄
+    → ∀ {A B} {f : Hom A B}
+    → ⦃ iso : is-iso Hom f ⦄
+    → is-iso Hom (f ⁻¹)
+  ⁻¹-iso {f = f} ⦃ iso ⦄  = record
+    { bwd = f
+    ; ∘-invˡ = ∘-invʳ f ⦃ iso ⦄
+    ; ∘-invʳ = ∘-invˡ f ⦃ iso ⦄
+    }
+
+{-# INCOHERENT ⁻¹-iso #-}
 
 record Isomorphism {Ob : Type} (Hom : Ob → Ob → Type) ⦃ _ : CompositionalOp Hom ⦄ (A B : Ob) : Type where
   constructor fwd

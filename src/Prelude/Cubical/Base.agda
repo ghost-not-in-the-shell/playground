@@ -64,16 +64,16 @@ module ApplicativeP where
 coe : ∀ {A₀ A₁} → A₀ ≡ A₁ → A₀ → A₁
 coe A a = transp (λ i → A i) i0 a
 
-subst : ∀ {A} (P : A → Type) {a₀ a₁} → a₀ ≡ a₁ → P a₀ → P a₁
-subst P a u = coe (cong P a) u
+transport : ∀ {A} (P : A → Type) {a₀ a₁} → a₀ ≡ a₁ → P a₀ → P a₁
+transport P a u = coe (cong P a) u
 
-subst₂ : ∀ {A} {B : A → Type} (P : (x : A) → B x → Type)
+transport₂ : ∀ {A} {B : A → Type} (P : (x : A) → B x → Type)
   → {a₀ a₁ : A} {b₀ : B a₀} {b₁ : B a₁}
   → (a : a₀ ≡ a₁)
   → (b : b₀ ≡ b₁ [ i ↦ B (a i)])
   → P a₀ b₀
   → P a₁ b₁
-subst₂ P a b u = coe (ap₂ P a b) u
+transport₂ P a b u = coe (ap₂ P a b) u
 
 Square : ∀ {A} {a₀₀ a₀₁ a₁₀ a₁₁ : A}
   → (a₀₋ : a₀₀ ≡ a₀₁)

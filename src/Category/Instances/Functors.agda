@@ -45,11 +45,11 @@ private
   ƛ′ {𝓒 = 𝓒} 𝐹 = record
     { map₀ = λ A → 𝐹 ₀₍ A ,-₎
     ; map₁ = λ f → 𝐹 ₁₍ f ,-₎
-    ; resp-id = ext λ {_} → resp-id 𝐹
-    ; resp-∘ = λ { {f = f} {g} → ext λ {_} → begin
+    ; resp-id = ext λ {S} → resp-id 𝐹
+    ; resp-∘ = λ {A B C f g} → ext λ {S} → begin
         𝐹 ₁(g ∘ f , id)          ≡⟨ ⦇ (𝐹 ₁_) ⦇ - , ∘-idʳ 𝓒 ⦈ ⦈ ⟨
         𝐹 ₁(g ∘ f , id ∘ id)     ≡⟨ resp-∘ 𝐹 ⟩
-        𝐹 ₁(g , id)∘ 𝐹 ₁(f , id) ∎ }
+        𝐹 ₁(g , id)∘ 𝐹 ₁(f , id) ∎
     }
 
 instance

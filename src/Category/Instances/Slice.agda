@@ -1,6 +1,7 @@
 module Category.Instances.Slice where
 open import Prelude
 open import Category.Base
+open ApplicativeReasoning
 
 private module /Ob&/Hom 𝓒 I where
   /Ob : Type
@@ -90,48 +91,73 @@ _/_ : ∀ 𝓒 I → Category
   ; ∘-assoc = ext (∘-assoc 𝓒)
   }
 
-module _ {𝓒} A where
-  open import Diagram.Product
-  open import Diagram.Product.Properties
-  open import Functor.Base
-  open import Functor.Bifunctor
+open import Functor.Base
+module _ {𝓒} I where
+  open import Limit.Instances.Product
 
-  forget/ : 𝓒 / A ⟶ 𝓒
-  forget/ = record
+  /forget : 𝓒 / I ⟶ 𝓒
+  /forget = record
     { map₀ = λ (A , a) → A
     ; map₁ = λ (f , f-vertical) → f
     ; resp-id = refl
     ; resp-∘  = refl
     }
 
-  constant-family : ⦃ BinaryProduct 𝓒 ⦄ → 𝓒 ⟶ 𝓒 / A
-  constant-family =
-    let instance _ = ×.productOp 𝓒
-    in record
-    { map₀ = λ B → A × B , π₁
-    ; map₁ = λ f → record
-      { morphism = id ×₁ f
-      ; vertical = begin
-                    π₁            ≡⟨ ∘-idˡ 𝓒 ⟨
-               id ∘ π₁            ≡⟨ ×.commute₁ 𝓒 ⟨
-        π₁ ∘ < id ∘ π₁ , f ∘ π₂ > ∎
+  module _ ⦃ _ : BinaryProduct 𝓒 ⦄ where
+    open import Adjoint.UnitCounit
+    private instance
+      _ = ×.productOp 𝓒
+
+    constant-family : 𝓒 ⟶ 𝓒 / I
+    constant-family = record
+      { map₀ = λ B → B × I , π₂
+      ; map₁ = λ f → record
+        { morphism = f ×₁ id
+        ; vertical = sym $ begin
+          π₂ ∘ < f ∘ π₁ , id ∘ π₂ > ≡⟨ ×.commute₂ 𝓒 ⟩
+                          id ∘ π₂   ≡⟨ ∘-idˡ 𝓒 ⟩
+                               π₂   ∎
+        }
+      ; resp-id = ext $ resp-id (-× I)
+      ; resp-∘  = ext $ resp-∘  (-× I)
       }
-    ; resp-id = ext $ resp-id (A ×-)
-    ; resp-∘  = ext $ resp-∘  (A ×-)
-    }
+
+    /forget⊣constant-family : /forget ⊣ constant-family
+    /forget⊣constant-family = record
+      { unit = record
+        { component = λ {(A , a)} → record
+          { morphism = < id , a >
+          ; vertical = sym (×.commute₂ 𝓒)
+          }
+        ; natural = λ {(A , a) (B , b) (f , f-vertical)} → ext $ begin
+            < id , b > ∘ f       ≡⟨ ×.<>∘ 𝓒 ⟩
+            < id ∘ f , b  ∘ f >  ≡⟨ ⦇ < ∘-idˡʳ 𝓒 , sym f-vertical > ⦈ ⟩
+            < f ∘ id ,      a >  ≡⟨ ⦇ < - , ∘-idˡ 𝓒 > ⦈ ⟨
+            < f ∘ id , id ∘ a >  ≡⟨ ×.×<> 𝓒 ⟨
+            f ×₁ id ∘ < id , a > ∎
+        }
+      ; counit = record
+        { component = λ {A} → π₁
+        ; natural = ×.commute₁ 𝓒
+        }
+      ; zig = ×.commute₁ 𝓒
+      ; zag = ext $ (begin
+          π₁ ×₁ id ∘ < id , π₂ > ≡⟨ ×.×<> 𝓒 ⟩
+          < π₁ ∘ id , id ∘ π₂ >  ≡⟨ ⦇ < ∘-idʳ 𝓒 , ∘-idˡ 𝓒 > ⦈ ⟩
+          < π₁      ,      π₂ >  ≡⟨ ×.eta 𝓒 ⟩
+          id                     ∎)
+      }
 
 module DependentSum 𝓒 where
-  open import Functor.Base
-
   _! : ∀ {I J} (u : 𝓒 ⦅ I , J ⦆) → 𝓒 / I ⟶ 𝓒 / J
-  _! u = record
+  u ! = record
     { map₀ = λ (A , a) → A , u ∘ a
-    ; map₁ = λ {(-, a)} {(-, b)} (f , f-vertical) → record
+    ; map₁ = λ {(A , a) (B , b)} (f , f-vertical) → record
       { morphism = f
       ; vertical = begin
-        u ∘ a      ≡⟨ - ○ f-vertical ⟩
-        u ∘(b ∘ f) ≡⟨ ∘-assoc 𝓒 ⟨
-       (u ∘ b)∘ f  ∎
+          u ∘ a      ≡⟨ - ○ f-vertical ⟩
+          u ∘(b ∘ f) ≡⟨ ∘-assoc 𝓒 ⟨
+         (u ∘ b)∘ f  ∎
       }
     ; resp-id = ext refl
     ; resp-∘  = ext refl

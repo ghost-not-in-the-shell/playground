@@ -14,12 +14,6 @@ record Category : Type where
     ∘-assoc : ∀ {A B C D} {f : Hom A B} {g : Hom B C} {h : Hom C D}
       → (h ∘ g) ∘ f ≡ h ∘ (g ∘ f)
 
-  HomSet : ∀ A B → Set
-  HomSet A B = record
-    { fst = Hom A B
-    ; snd = Hom-set
-    }
-
   ∘-idˡʳ : ∀ {A B} {f : Hom A B} → id ∘ f ≡ f ∘ id
   ∘-idˡʳ = trans ∘-idˡ (sym ∘-idʳ)
 
@@ -87,11 +81,28 @@ private module Sets where
   is-iso-Map A B f = is-iso Map ⦃ op 𝓢𝓮𝓽 ⦄ {A} {B} f
 
   instance
-    𝓢𝓮𝓽-iso : ∀ {A B} {f : Map A B} ⦃ _ : is-iso Function f ⦄ → is-iso-Map A B f
-    𝓢𝓮𝓽-iso {f = f} = record
+    Function→Map : ∀ {A B} {f : Map A B} ⦃ _ : is-iso Function f ⦄ → is-iso-Map A B f
+    Function→Map {f = f} = record
       { bwd = f ⁻¹
       ; ∘-invˡ = ∘-invˡ f
       ; ∘-invʳ = ∘-invʳ f
+      }
+
+    {-# INCOHERENT Function→Map #-}
+
+    Map→Function : ∀ {A B} {f : Map A B} ⦃ map : is-iso-Map A B f ⦄ → is-iso Function f
+    Map→Function {f = f} ⦃ Map-iso ⦄  = record
+      { bwd    = _⁻¹    ⦃ op 𝓢𝓮𝓽 ⦄ f ⦃ Map-iso ⦄
+      ; ∘-invˡ = ∘-invˡ ⦃ op 𝓢𝓮𝓽 ⦄ f ⦃ Map-iso ⦄
+      ; ∘-invʳ = ∘-invʳ ⦃ op 𝓢𝓮𝓽 ⦄ f ⦃ Map-iso ⦄
+      }
+
+    {-# INCOHERENT Map→Function #-}
+
+    𝓢𝓮𝓽-terminalOp : TerminalOp Map
+    𝓢𝓮𝓽-terminalOp = record
+      { 𝟙 = el! ⊤
+      ; <> = λ _ → tt
       }
 
 open Sets public

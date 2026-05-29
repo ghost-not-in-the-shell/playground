@@ -53,6 +53,23 @@ module _ where
   is-hlevel-+ n zero = id
   is-hlevel-+ n (suc k) ncube = is-hlevel-suc (k + n) (is-hlevel-+ n k ncube)
 
+  is-prop→is-hlevel-suc : ∀ n → is-prop A → is-hlevel A (suc n)
+  is-prop→is-hlevel-suc zero = id
+  is-prop→is-hlevel-suc (suc n) path = is-hlevel-suc (suc n) (is-prop→is-hlevel-suc n path)
+
+  ⊤-is-contr : is-contr ⊤
+  ⊤-is-contr = record
+    { centre = tt
+    ; path-to = λ { tt → refl }
+    }
+
+  ⊤-is-prop : is-prop ⊤
+  ⊤-is-prop = λ tt tt → refl
+
+  ⊤-is-hlevel : ∀ n → is-hlevel ⊤ n
+  ⊤-is-hlevel zero = ⊤-is-contr
+  ⊤-is-hlevel (suc n) = is-prop→is-hlevel-suc n ⊤-is-prop
+
   Path-is-hlevel : ∀ n → is-hlevel A (suc n) → ∀ x y → is-hlevel (Path A x y) n
   Path-is-hlevel 0 path x y = record
     { centre = path x y
@@ -63,7 +80,7 @@ module _ where
   PathP-is-hlevel : {A : 𝕀 → Type} (n : Nat) → is-hlevel (A i1) (suc n)
     → ∀ x y → is-hlevel (PathP A x y) n
   PathP-is-hlevel {A} n ncube x y =
-    subst (λ A → is-hlevel A n) (sym (PathP≡Path0→1 A x y))
+    transport (λ A → is-hlevel A n) (sym (PathP≡Path0→1 A x y))
       $ Path-is-hlevel n ncube (coe0→1 A x) y
 
   is-prop∙→is-contr : A → is-prop A → is-contr A
@@ -339,15 +356,20 @@ module _ where
   Σ-is-set : is-set A → (∀ x → is-set (B x)) → is-set (Σ A B)
   Σ-is-set = Σ-is-hlevel 2
 
-_-Type : Nat → Type
-n -Type = Σ[ A ∈ Type ] is-hlevel A n
+record _-Type (n : Nat) : Type where
+  constructor _,_
+  field
+    ∣_∣ : Type
+    hlevel : is-hlevel ∣_∣ n
 
-Prop = 1 -Type
+open _-Type public using (∣_∣; hlevel)
+
+rop = 1 -Type
 Set  = 2 -Type
 
 instance
   Set-underlying : Underlying Set
-  Set-underlying = underlying-instance fst
+  Set-underlying = underlying-instance ∣_∣
 
 module Automation where
   record IsHLevel (A : Type) n : Type where
@@ -359,8 +381,8 @@ module Automation where
     A : Type
     B : A → Type
 
-  hlevel : ∀ {n} ⦃ _ : IsHLevel A n ⦄ → is-hlevel A n
-  hlevel ⦃ hlevel-instance ncube ⦄ = ncube
+  hlevel! : ∀ n ⦃ _ : IsHLevel A n ⦄ → is-hlevel A n
+  hlevel! n ⦃ hlevel-instance ncube ⦄ = ncube
 
   IsContr : (A : Type) → Type
   IsProp  : (A : Type) → Type
@@ -370,18 +392,22 @@ module Automation where
   IsSet   A = IsHLevel A 2
 
   instance
+    ⊤-HLevel : ∀ {n}
+      → IsHLevel ⊤ n
+    ⊤-HLevel {n} = hlevel-instance $ ⊤-is-hlevel n
+
     Π-HLevel : ∀ {n}
       → ⦃ _ : ∀ {x} → IsHLevel (B x) n ⦄
       → IsHLevel (∀ x → B x) n
-    Π-HLevel {n = n} = hlevel-instance $ Π-is-hlevel n λ _ → hlevel
+    Π-HLevel {n = n} = hlevel-instance $ Π-is-hlevel n λ _ → hlevel! n
 
     Σ-HLevel : ∀ {n}
       → ⦃ _ : IsHLevel A n ⦄
       → ⦃ _ : ∀ {x} → IsHLevel (B x) n ⦄
       → IsHLevel (Σ A B) n
-    Σ-HLevel {n = n} = hlevel-instance $ Σ-is-hlevel n (hlevel) λ _ → hlevel
+    Σ-HLevel {n = n} = hlevel-instance $ Σ-is-hlevel n (hlevel! n) λ _ → hlevel! n
 
   el! : ∀ {n} (A : Type) ⦃ _ : IsHLevel A n ⦄ → n -Type
-  el! A = A , hlevel
+  el! {n} A = A , hlevel! n
 
 open Automation public

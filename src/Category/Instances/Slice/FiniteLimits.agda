@@ -1,36 +1,34 @@
-module Category.Instances.Slice.FiniteLimits 𝓒 {I} where
+module Category.Instances.Slice.FiniteLimits 𝓒 where
 open import Prelude
 open import Category.Base
 open import Category.Instances.Slice
-open import Diagram.Product
-open import Diagram.Pullback
-open import Diagram.Terminal
+open import Limit.Instances.Product
+open import Limit.Instances.Pullback
+open import Limit.Instances.Terminal
 
-/terminal : Terminal (𝓒 / I)
-/terminal =
-  let 𝟙ᵢ : Ob (𝓒 / I)
-      𝟙ᵢ = I , id
-  in record
-  { apex = 𝟙ᵢ
-  ; terminal = λ (Xᵢ@(-, x)) →
-    let !ᵢ : 𝓒 / I ⦅ Xᵢ , 𝟙ᵢ ⦆
-        !ᵢ = record
+instance
+  /terminal : ∀ {I} → Terminal (𝓒 / I)
+  /terminal {I} =
+    let 𝟙ᵢ : Ob (𝓒 / I)
+        𝟙ᵢ = I , id
+
+        <>ᵢ : ∀ {Xᵢ} → 𝓒 / I -⦅ Xᵢ , 𝟙ᵢ ⦆
+        <>ᵢ {(-, x)} = record
           { morphism = x
           ; vertical = sym (∘-idˡ 𝓒)
           }
-
-        uniqueᵢ : ∀ ⁇ᵢ → !ᵢ ≡ ⁇ᵢ
-        uniqueᵢ (⁇ , ⁇-vertical) = ext $ begin
-          x      ≡⟨ ⁇-vertical ⟩
-          id ∘ ⁇ ≡⟨ ∘-idˡ 𝓒 ⟩
-               ⁇ ∎
     in record
-    { centre = !ᵢ
-    ; path-to = uniqueᵢ
+    { apex = 𝟙ᵢ
+    ; terminal = record
+      { mediate = <>ᵢ
+      ; unique = λ {(X , x)} {(⁇ , ⁇-vertical)} → ext $ begin
+               ⁇ ≡⟨ ∘-idˡ 𝓒 ⟨
+          id ∘ ⁇ ≡⟨ ⁇-vertical ⟨
+          x      ∎
+      }
     }
-  }
 
-module _
+module _ {I}
   {Aᵢ@(A , a) Bᵢ@(B , b) Aᵢ×Bᵢ@(A⊗B , diag) : Ob (𝓒 / I)}
   {πᵢ₁@(p , p-vertical) : 𝓒 / I ⦅ Aᵢ×Bᵢ , Aᵢ ⦆}
   {πᵢ₂@(q , q-vertical) : 𝓒 / I ⦅ Aᵢ×Bᵢ , Bᵢ ⦆} where
@@ -48,11 +46,11 @@ module _
       in record
       { morphism = < f [ □ ] g >′
       ; vertical = begin
-        x                    ≡⟨ f-vertical ⟩
-        a ∘       f          ≡⟨ - ○ commute₁ ⟨
-        a ∘(p ∘ < f [] g >′) ≡⟨ ∘-assoc 𝓒 ⟨
-       (a ∘ p)∘ < f [] g >′  ≡⟨ p-vertical ○ - ⟨
-        diag  ∘ < f [] g >′  ∎
+        x                   ≡⟨ f-vertical ⟩
+        a ∘       f         ≡⟨ - ○ commute₁ ⟨
+        a ∘(p ∘ < f □ g >′) ≡⟨ ∘-assoc 𝓒 ⟨
+       (a ∘ p)∘ < f □ g >′  ≡⟨ p-vertical ○ - ⟨
+        diag  ∘ < f □ g >′  ∎
       }
     ; commute₁ = ext commute₁
     ; commute₂ = ext commute₂
@@ -105,7 +103,7 @@ module _
                   (ext ⁇-commute₂)
     } where open is-product prod
 
-module _
+module _ {I}
   {Jᵢ@(J , u) Aᵢ@(A , u∘a) Bᵢ@(B , u∘b) Aᵢ⊗Bᵢ@(A⊗B , diag) : Ob (𝓒 / I)}
   {aᵢ@(a , a-vertical) : 𝓒 / I ⦅ Aᵢ    , Jᵢ ⦆}
   {bᵢ@(b , b-vertical) : 𝓒 / I ⦅ Bᵢ    , Jᵢ ⦆}
@@ -120,11 +118,11 @@ module _
     ; mediate = λ {(X , x)} (f , f-vertical) (g , g-vertical) □ᵢ → record
       { morphism = < f [ ap fst □ᵢ ] g >′
       ; vertical = begin
-        x                      ≡⟨ f-vertical ⟩
-        u∘a ∘       f          ≡⟨ - ○ commute₁ ⟨
-        u∘a ∘(p ∘ < f [] g >′) ≡⟨ ∘-assoc 𝓒 ⟨
-       (u∘a ∘ p)∘ < f [] g >′  ≡⟨ p-vertical ○ - ⟨
-        diag    ∘ < f [] g >′  ∎
+        x                     ≡⟨ f-vertical ⟩
+        u∘a ∘       f         ≡⟨ - ○ commute₁ ⟨
+        u∘a ∘(p ∘ < f □ g >′) ≡⟨ ∘-assoc 𝓒 ⟨
+       (u∘a ∘ p)∘ < f □ g >′  ≡⟨ p-vertical ○ - ⟨
+        diag    ∘ < f □ g >′  ∎
       }
     ; commute₁ = ext commute₁
     ; commute₂ = ext commute₂
@@ -180,13 +178,13 @@ module _
                    (ext ⁇-commute₂)
     } where open is-pullback pull
 
-/products : ⦃ Pullbacks 𝓒 ⦄ → BinaryProduct (𝓒 / I)
-/products ⦃ pull-instance@(pullback-instance pull) ⦄ = product-instance
+pullbacks→/products : ∀ {I} ⦃ _ : Pullbacks 𝓒 ⦄ → BinaryProduct (𝓒 / I)
+pullbacks→/products {I} ⦃ pull ⦄ = product-instance
   λ Aᵢ@(A , a) Bᵢ@(B , b) →
     let instance _ = ⊗.pullbackOp 𝓒
 
         Aᵢ×Bᵢ : Ob (𝓒 / I)
-        Aᵢ×Bᵢ = A ⊗₍ a , b ₎ B , a ∘ p
+        Aᵢ×Bᵢ = a ⊗ b , a ∘ p
 
         πᵢ₁ : 𝓒 / I ⦅ Aᵢ×Bᵢ , Aᵢ ⦆
         πᵢ₁ = record
@@ -205,18 +203,38 @@ module _
       { apex = Aᵢ×Bᵢ
       ; π₁ = πᵢ₁
       ; π₂ = πᵢ₂
-      ; product = is-pullback→is-fibre-product $
-                    Pullback.pullback (pull a b)
+      ; product = is-pullback→is-fibre-product
+                  $ Pullback.pullback
+                  $ Pullbacks.has-all-pullbacks pull a b
       }
 
-/pullbacks : ⦃ Pullbacks 𝓒 ⦄ → Pullbacks (𝓒 / I)
-/pullbacks ⦃ pull-instance@(pullback-instance pull) ⦄ = pullback-instance
-  λ {Jᵢ@(J , u)} {Aᵢ@(A , u∘a)} {Bᵢ@(B , u∘b)}
+/products→pullbacks : ⦃ ∀ {I} → BinaryProduct (𝓒 / I) ⦄ → Pullbacks 𝓒
+/products→pullbacks ⦃ prod ⦄ = pullback-instance
+  λ {I A B} a b →
+    let instance _ = ×.productOp (𝓒 / I)
+
+        Aᵢ : 𝓒 / I -Ob
+        Aᵢ = A , a
+
+        Bᵢ : 𝓒 / I -Ob
+        Bᵢ = B , b
+    in record
+      { apex = fst (Aᵢ × Bᵢ)
+      ; p = fst π₁
+      ; q = fst π₂
+      ; pullback = is-fibre-product→is-pullback
+                   $ Product.product
+                   $ BinaryProduct.has-all-products prod Aᵢ Bᵢ
+      }
+
+pullbacks→/pullbacks : ∀ {I} ⦃ _ : Pullbacks 𝓒 ⦄ → Pullbacks (𝓒 / I)
+pullbacks→/pullbacks {I} ⦃ pull ⦄ = pullback-instance
+  λ {Jᵢ@(J , u) Aᵢ@(A , u∘a) Bᵢ@(B , u∘b)}
      aᵢ@(a , a-vertical) bᵢ@(b , b-vertical) →
     let instance _ = ⊗.pullbackOp 𝓒
 
         Aᵢ⊗Bᵢ : Ob (𝓒 / I)
-        Aᵢ⊗Bᵢ = A ⊗₍ a , b ₎ B , u∘a ∘ p
+        Aᵢ⊗Bᵢ = a ⊗ b , u∘a ∘ p
 
         pᵢ : 𝓒 / I ⦅ Aᵢ⊗Bᵢ , Aᵢ ⦆
         pᵢ = record
@@ -239,6 +257,7 @@ module _
       { apex = Aᵢ⊗Bᵢ
       ; p = pᵢ
       ; q = qᵢ
-      ; pullback = is-pullback→is-fibre-pullback $
-                     Pullback.pullback (pull a b)
+      ; pullback = is-pullback→is-fibre-pullback
+                   $ Pullback.pullback
+                   $ Pullbacks.has-all-pullbacks pull a b
       }
